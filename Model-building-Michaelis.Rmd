@@ -1,0 +1,85 @@
+---
+title: "Model building"
+author: "Johanna Daas"
+date: "3 12 2020"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Model building and setting Reaction Kinetics
+
+This workflow shows how to build models in cork, as well as how to define your own reaction kinetics.
+
+## Setup
+First, we load the nessecary packages. Make sure, that you have [**CoRC**](https://jpahle.github.io/CoRC/index.html) installed, before calling the library function.
+```{r}
+library(CoRC)
+```
+
+## Building the model
+To start a model from scratch, you have to load a new Model. To create something *new*, you use the keyword "new".
+```{r}
+newModel()
+```
+Similarly, we can define species in the model like this:
+```{r}
+newSpecies("a")
+```
+Notice, how a default compartment is created. If you want to define your own compartment you can call it manually in the creation of the species or change the compartent of the species later. You can also give specifications to the compartment, like the initial size.
+```{r}
+newCompartment("Comp1", initial_size = 100)
+
+newSpecies("b", compartment = "Comp1")
+```
+If you want to inspect elements of your model, you can use the "*get*" command. For example, you can look at your Species like this:
+```{r}
+getSpecies()
+```
+Now, species "a" and "b" are in different compartments. To change that, we want to *set* the compartment in a Species. 
+```{r}
+setSpecies("a", compartment = "Comp1")
+getSpecies()
+```
+
+## Defining your own Reaction Kinetics
+In a model, we want our species to interact with each other. In this toy example, we want "a" to be converted to "b".
+
+For that, we want to use the Michaelis-Menten-Kinetics. The rate of a reaction with Michaelis-Menten-Kinetics is defined as:
+$$v = \frac{v_{max} * S}{S + K_{m}}$$
+where $v_{max}$ is the maximum reaction speed, $S$ is the concentration of the substrate and $K_{m}$ the Michaelis constant.
+
+To define our kinetic function, we have to define a name, the function itself as well as the parameters:
+
+```{r}
+newKineticFunction(
+  "manual MM",
+  "((vmax * substrate) / (substrate + Km))",
+  parameters = list(substrate = "substrate")
+)
+```
+Now we want to add a reaction to our model, using our kinetic function.
+In **CoRC** we can show species "a" gets converted to species "b" by using the formula "a -> b". (For a reversible reaction it would be "a = b").
+
+```{r}
+newReaction(
+  "a -> b",
+  fun = "manual MM",
+  mapping = list(
+    substrate = "a",
+    vmax = 0.1,
+    Km = 0.1
+  )
+)
+```
+## More reactions:
+Of course, **CoRC** has some typical reaction kinetics already implemented. This is also the case with the irriversible Michaelis-Menten. You can find all implemented functions [here](www.google.com) LINK!. 
+Another helpful quality of **CoRC** is, that missing elements of a model get automatically created when needed.
+```{r}
+newReaction("c -> d",
+            fun = "Henri-Michaelis-Menten (irreversible)")
+```
+This not only creates the reaction but also creates species "c" and "d".
