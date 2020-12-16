@@ -4,10 +4,12 @@ author: "Johanna Daas"
 date: "4 12 2020"
 output: html_document
 toc_float: True
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 # Introduction
 Why are oscillations so fascinating for science? You will find an answer to that question (hopefully), as well as learn how to code with CoRK. 
@@ -169,12 +171,146 @@ ggplot(data = timecourse) +
 
 # {-}
 
+# Oscillation
+
+Now, the question presents itself: How and why does this model oscillate? And why does it matter? 
+
+To answer the last question first, oscillators are fascinating because a lot of fascinating signalling pathways in biology oscillate. You can think about why that might have some sort of evolutionary advantage. What is in our environment that changes over time in an oscillating way?
+
+The first thing that might come to mind is our day-and-night-cycle. And indeed, we find oscillating signalling pathways here. Even without external stimuli these oscillation prevail. For example, one of biologist's favourite pet, the fruit fly *Drosophila melanogaster* has the proteins PER (short for *period*) and TIM (short for *timeless*) that act as their "clock"  (Tyson, 1999)
+
+The fist question is a bit harder to answer.
+
+Take a look at our oscillating model below:
+```{r, echo = FALSE}
+
+newModel()
+newSpecies("prey", initial_concentration = 100)
+newSpecies("predator", initial_concentration = 2)
+
+newReaction("predator + 5 * prey -> 2 * predator")
+newReaction("prey + prey -> 3 * prey")
+newReaction("predator ->")
 
 
 
+renderPlot({
+  #again, do I really need to call that?
+  res <- runTC(duration = 1000)$result %>% 
+    pivot_longer(-Time, names_to = "names", values_to = "values")
+  
+  ggplot(data = res)+
+    geom_line(aes(x = Time, y = values, color = names))
+})
+```
+This is a representation of a so called predator-prey model from Lotka-Volterra (DATE!)
+We will build the model in the following tasks.
+
+<!-- Species -->
+
+
+# Species {.tabset .tabset-pills}
+We call the elements in our model "species". Here, this is even more true. We will have two species, "Cats" and "Mice". 
+
+We will first have to create a new model and then our two species.
+
+## Code
+```{r}
+#Your code here
+```
+
+## Hint
+To create something new, we use the *new* family of functions. Just try it, RStudio tries to autofill your functions, so you might find what you need like that.
+
+## Solution
+```{r}
+#First, make a new model
+newModel()
+
+#Then two new species
+newSpecies("Cats")
+newSpecies("Mice")
+```
+# {-}
+
+<!-- Functions -->
+
+# Functions {.tabset .tabset-pills}
+We will want to create 4 functions:
+
+1. Cats multiplying
+2. Mice multiplying
+3. Cats dying 
+4. Mice dying
+
+First, we will only create these. The relationship between these species will be introduced in the rate laws later
+
+## Code
+```{r}
+#newReaction()
+```
+
+## Hint
+
+We want to create a reaction for breeding and one for dying. For cats this might look like this:
+```{r}
+#Cats being born:
+newReaction("Cats -> 2 * Cats")
+
+#Cats dying:
+newReaction("Cats ->")
+```
+For the Mice it looks similar. Try it!
+
+## Solution
+
+```{r, include = FALSE}
+unloadModel()
+newModel()
+```
+When creating a reaction, we need to use the *newReaction()* function.
+
+For the "dying"-functions, we tell **CoRC** that there was something there and then it isn't there anymore:
+```{r}
+newReaction("Cats -> ")
+newReaction("Mice -> ")
+```
+
+For more mice we need mice in the first place, so a similar " -> Mice" won't work, even if this is possible in **CoRC**. This would be the case if we have a constant migration of mice into our space.
+Instead we will multiply mice and cats:
+```{r}
+newReaction("Cats -> 2 * Cats")
+newReaction("Mice -> 2 * Mice")
+```
+Because we are dealing in concentrations (in our example that would be mice / square meter or similar) we can say that one mouse can create two mice, even if that doesn't necessarily make sense.
+# {-}
 
 
 
+# Rate laws {.tabset .tabset-pills}
+We will now make the rate laws for our reactions.
+The underlying equations are the following:
+
+$$ dx/dt = ax - bxy$$
+$$ dy/dt = dxy - gy $$
+$x$ is the number of prey (Mice), $y$ is the number of some predators (Cats), $a,b,d,y$ are parameters for the interaciton of these species.
+
+These differential equations show the growth rates for the populations, but for our rate laws, we need 
+
+
+## Code
+## Hint
+## Solution
+# {-}
+
+
+
+In a helpful review from Novák and Tyson (2008) we find the following requirements for oscillators:
+
+1. Negative feedback to carry a reaction network back to the 'starting point' of oscillation
+2. Negative feedback signal sufficiently delayed in time so we don't get a steady state
+3. Kinetic rate laws need to be nonlinear
+4. Reactions that produce and consume interacting chemical species must occur on appropriate time scales.
 ###################
 # Name {.tabset .tabset-pills}
 ## Code
