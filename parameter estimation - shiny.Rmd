@@ -6,7 +6,7 @@ output: html_document
 runtime: shiny
 toc_float: TRUE
 ---
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = FALSE}
 library(CoRC)
 library(tidyverse, verbose = FALSE, quietly = TRUE, suppressPackageStartupMessages())
 ```
@@ -131,7 +131,7 @@ library(ggplot2)
 ```
 
 ## 1. Load a model
-As stated above, to make a parameter estimation, you have to have a model to work on. If you want to know how to build you own model, you can [klick here](www.google.com) LINK!
+As stated above, to make a parameter estimation, you have to have a model to work on. If you want to know how to build you own model, you can [klick here](https://jpahle.github.io/CoRC/articles/model_building.html).
 
 In this workflow, we will instead load a SMBL-model.
 
@@ -166,10 +166,11 @@ Then you have to define the experiment for COPASI. You need the data, as well as
 
 Your data colums in your data file can be of type "time", "dependent" and "independent", and if you want to exclude a column you can choose "ignore".
 
-The mapping argument in the function maps the data columns with the species in your model. In our case, the provided data is time course data, and our values are "transient concentrations". They are denoted like this: {[Species]}
-Other notations are found [here]() LINK!!! Time needs to be mapped with NA.
+The mapping argument in the function maps the data columns with the species in your model. In our case, the provided data is time course data, and our values are "transient concentrations". They are denoted like this: {[Species]}. You can find these notation by using the function *getSpeciesReferences()*.
 
-Allowed weight methods are 'mean', 'mean_square', 'sd', and 'value_scaling'. 
+Time needs to be mapped with NA.
+
+Allowed weight methods are *'mean', 'mean_square', 'sd'*, and *'value_scaling'*. 
 
 ```{r}
 fit_experiments <- defineExperiments(
@@ -190,8 +191,6 @@ Now, we only want to fit the reaction rates (parameters with V). To make our fit
 
 
 ```{r}
-#Wir können natürlich auch die regex etc... lösung nehmen (sehr viel eleganter), aber ich finde das hier deutlich einfacher zu verstehen.
-
 fit_parameters <- list(
   defineParameterEstimationParameter(
     ref = "{(MAPKKK activation).V1}",
@@ -237,7 +236,7 @@ To show how well our Parameter Estimation works, we want to print the model befo
 ```{r}
 before <- runTimeCourse(duration = 1000, dt = 1)$result
 ```
-After doing this, we will now actually run the Parameter Estimation. We need the [parameters](# 3. Define Parameters), [experiments](# ) with our data that will be fitted, and specify the method. We want to use the Levenberg Marquardt method but other methods are available as well. You can find a link to them [here](www.google.de)(LIIINK!!!!) 
+After doing this, we will now actually run the Parameter Estimation. We need the parameters, experiments with our data that will be fitted, and specify the method. We want to use the Levenberg Marquardt method but other methods are available as well. You can find them using the function *getValidReactionFunctions()* with your function as an argument.
 
 Also, we specify that we want to update our model. This means, that all estimated parameters will be updated with the parameters of the best estimation. To compare the fit to the previous parameters we need to make sure we keep the previous fit. We already did that with our time course in the last chunk.
 
@@ -263,7 +262,7 @@ Now we have estimated and updated the parameters of our current model. To compar
 ```{r}
 after <- runTimeCourse(duration = 1000, dt = 1)$result
 ```
-We will use ggplot for visualizing our results. If you have never worked with ggplot, this way to define a plot will look unusual to you. You can find some great reference to learn about plotting with **R** and **ggplot** [here](www.google.com) (LIIINK!)
+We will use ggplot for visualizing our results. If you have never worked with ggplot, this way to define a plot will look unusual to you. 
 
 We first want to plot our expermental data, as well as two time courses (before and after) for Erk2-P and Mos-P. 
 ```{r}
