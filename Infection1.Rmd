@@ -1,0 +1,235 @@
+---
+title: "Infection Model"
+author: "Johanna Daas"
+date: "16 12 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Loading the required packages
+library(tidyverse)
+library(CoRC)
+
+#Some setup for CoRC
+newModel()
+newCompartment(name = "berlin", dimensionality = 2, initial_size = 891.8)
+```
+We will built a small model of infections. First, we have three species, **S**usceptibles (S), **I**nfectious (I), and **R**ecovered (R).
+```{r}
+#newModel()
+newSpecies("S", compartment = "berlin")
+newSpecies("I", compartment = "berlin")
+newSpecies("R", compartment = "berlin")
+```
+We will need to define two reactions; one where our Susceptibles get infected with a propablity $k_1$ and Infected can recover and not be infected anymore with propablility $k_2$.
+
+The differential equations for our model look like this:
+
+$$ 
+\frac{dS}{dt} = -k_1[S]
+$$
+$$ 
+\frac{dI}{dt} = k_1[S] - k_2[I]
+$$
+$$ 
+\frac{dR}{dt} = k_2[I]
+$$
+```{r}
+newReaction("S -> I")
+newReaction("I -> R")
+```
+# Making the model more like reality
+
+We need to take a look at the reaction parameters and species of our model:
+
+```{r}
+getSpecies()
+getParameters()
+```
+
+
+Obviously, it does not really make sense, that all our Species have the same initial number and that recovery is as quickly as infection. So we need something to make our model more accurate to real live. 
+
+Let us take a look at the cases of COVID-19 in berlin[^1]:
+```{r}
+all <- read.csv("data/gesamt.csv", sep = ";")
+berlin <- tibble(Week = all[-(1:10),1], Cases =  as.numeric(all[-(1:10),"X.1"]))
+
+ggplot(data = berlin, aes(x = Week, y = Cases))+
+  geom_line()
+```
+For our species we can use the initial number of cases. We need the number of residents for berlin (which is roughly 3,669,500 [^2]) as "Susceptibles" and the number of infected for week ten for the initial number of "Infected". We will assume that so far there are not any recovered.
+
+```{r}
+init_infected <- unname(unlist(berlin[1,2]))
+init_infected
+
+
+setSpecies(key = getSpecies()$key, initial_number = c(3669500, init_infected, 0))
+```
+
+Our model now looks like this:
+```{r, echo = FALSE}
+simplemodel <- runTC(duration = 50, dt = 0.1)$result_number %>%
+  pivot_longer(-Time, names_to = "Species", values_to = "Number")
+
+ggplot(data = simplemodel, aes(x = Time, y = Number, color = Species))+
+ # geom_line(data = berlin, aes(x = Week, y = Cases))+
+  geom_line()
+
+```
+
+Our infections are causing a curve, which looks similar to what we are seeing between weeks ten and twenty for our data of berlin. The second curve is not predicted by our model, which tells us that there is more going on in real life that can not be explained by our model. But first let us fokus on the behaviour our model does predict: The individual peaks. 
+
+If we take a look at the x axis, we can see that our model overestimates the infections. The peak number of cases for our model is estimated to be around 1,5 million. In our real data the first peak between weeks 10 and 20 reaches roughly 1400 cases and the second a bit below 8500.
+
+For our model to predict the peak of our curves correctly, we need to change the parameters of our model.
+
+# Parameter estimation
+Setting the right parameters is not as easy as finding the initial numbers for our species. We can try to find our parameters analytically, but we can also do a parameter estimation for our model:
+
+
+```{r}
+#Trying to find that by chance:
+setParameters(key = getParameters()$key, value = c(k1,k2))
+
+simplemodel <- runTC()$result_number %>%
+  pivot_longer(-Time, names_to = "Species", values_to = "Number")
+
+ggplot()+
+  geom_line(data = simplemodel, aes(x = Time, y = Number, color = Species))#+
+  #geom_line(data = berlin_data, aes(x = Week, y = Cases))
+
+```
+
+
+```{r}
+berlin_data <- berlin
+berlin_data[,1] <- berlin_data[,1]-10
+#Define Experiment
+fit_experiment <- defineExperiments(
+  data = berlin_data[33:43,],
+  type = c("time", "dependent"),
+  mapping = c(NA, "{I.ParticleNumber}"),
+)
+
+ 
+#Define parameters that will be fitted
+parameters <- list(
+  defineParameterEstimationParameter(
+    ref = parameter(getParameters()$key[1], "Value")),
+  defineParameterEstimationParameter(
+    ref = parameter(getParameters()$key[2], "Value")
+)
+)
+ 
+#Run parameter estimation
+result <- runParameterEstimation(
+  parameters = parameters,
+  experiments = fit_experiment,
+  method = list(
+      method = "LevenbergMarquardt"
+     ),
+  update_model = TRUE,
+  randomize_start_values = TRUE
+)
+ 
+result$parameters
+
+
+```
+
+
+So now we will look at our model. For this, we will run a timecourse and reshape the data for ggplot.
+
+```{r}
+simpelmodel <- runTimeCourse(duration = 5000, dt = 1)$result %>%
+  pivot_longer(-Time, names_to = "names", values_to = "values")
+
+ggplot(data = simpelmodel)+
+  geom_line(aes(x = Time, y = values, color = names))
+```
+
+So, we can see, that over a short period of time, all our susceptibles will be will get infected but they recover quickly. 
+
+But, sadly, with infectious diseases, we not only have people who recover from the infection, but also those who will die. This is obviously the factor we want to minimize the most when combating infectious diseases.  So we need to add another species (D: *D*eath) to our model:
+
+```{r}
+newReaction("I -> D")
+
+```
+We want to set the parameters in a way, that the death much less likely than recovery:
+```{r}
+getParameters()
+setParameters(key = "(I -> D).k1", value = 0.0001)
+```
+Our new model now looks like this:
+```{r}
+simpelmodel <- runTimeCourse(duration = 50, dt = 1)$result %>%
+  pivot_longer(-Time, names_to = "names", values_to = "values")
+
+ggplot(data = simpelmodel)+
+  geom_line(aes(x = Time, y = values, color = names))
+```
+
+But what can we do, that the infections don't get up so quickly?
+
+First, we can try to put our infectious into quarantine. For this, we will create a new compartment and new reactions for infected go into quarantine and recovering.
+
+```{r}
+newCompartment("Quarantine")
+
+newReaction("I{compartment} -> I{Quarantine}")
+newReaction("I{Quarantine} -> R" )
+
+getSpecies()
+
+```
+Let us take a look at our model now:
+
+```{r, echo = FALSE}
+quarantine <- runTimeCourse(duration = 50, dt = 1)$result %>%
+  pivot_longer(-Time, names_to = "names", values_to = "values")
+
+ggplot(data = quarantine)+
+  geom_line(aes(x = Time, y = values, color = names))
+```
+
+You can see, that the number of infected in quarantine follows the number of infected not in quarantine. It takes time to find Infected and they can infect people before being put into quarantine. 
+
+To compare our two models, we need to compare the total infected, so we need to add up the infected in and outside quarantine.
+
+# ```{r, echo = FALSE}
+# quarantine <- runTimeCourse(duration = 50, dt = 1)$result %>% add_column(I = rowSums(quarantine['I{compartment}'] + quarantine['I{Quarantine}'])) %>%  pivot_longer(-Time, names_to = "names", values_to = "values")
+# 
+# 
+# compareplot <- ggplot()+
+#   geom_line(data = simplemodel, aes(x = Time, y = values, color = names), linetype = "dotted")+
+#   geom_line(data = quarantine, aes( x = Time, y = values, color = names))
+# 
+# compareplot
+#   
+# ```
+
+You can see that the total number of infected in the model without quarantine (dotted) rises higher than in the model with quarantine. 
+
+
+
+
+
+
+We will now try to find out, what can be done to minimize the total infected. For this, we will perform a sensitivity analysis.
+
+## Sensitivity analysis
+First, we need to define some *global quantities* which we can use to evaluate our model. The first (and most obvious) we already used: The total number of infected (over time.)
+
+
+
+#
+[^1]:Robert Koch Institute: SurvStat@RKI 2.0, https://survstat.rki.de, deadline: 05/01/2021
+[RKI](https://survstat.rki.de/Content/Query/Create.aspx)
+[^2]:Statistik Berlin Brandenburg, accessed on 05.01.2021 (https://www.statistik-berlin-brandenburg.de/BasisZeitreiheGrafik/Bas-Bevoelkerungsstand.asp?Ptyp=300&Sageb=12015&creg=BBB&anzwer=6)[https://www.statistik-berlin-brandenburg.de/BasisZeitreiheGrafik/Bas-Bevoelkerungsstand.asp?Ptyp=300&Sageb=12015&creg=BBB&anzwer=6]
