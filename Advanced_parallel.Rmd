@@ -1,14 +1,11 @@
 ---
 title: "Parallel processing with CoRC"
-author: "Johanna Daas"
-date: "16 12 2020"
+author: "Jonas Förster, Johanna Daas"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-```{r}
+
+```{r,  message = FALSE}
 library(tidyverse)
 library(parallel)
 library(CoRC)
@@ -27,7 +24,7 @@ mapInParallel <- function(data, fun, ..., .export = character(), .prep = {}) {
 
 # Statistics of Repeated Stochastic Simulations
 
-This is another example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91).
+This is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91) [^1].
 
 First, we always have to load our model:
 ```{r}
@@ -45,8 +42,8 @@ model_string <- saveModelToString()
 
 
 
-Now we will set everything up to run 1000 Timecouses in parallel. We need to export our model to the workers, as well as load CoRC and our model for each worker.
-Afterwards, we seet 1000 random seeds so each time course will get a different random seed and last we actually call the timecourse function.
+Next, we will set everything up to run 1000 Timecouses in parallel. We need to export our model to the workers, as well as load CoRC and our model for each worker.
+Afterwards, we seet 1000 random seeds so each time course will get a different random seed. Lastly, we call the timecourse function.
 ```{r}
 timeseries <-
   #Defines parallel evaluation
@@ -106,7 +103,7 @@ unloadModel()
 ```
 
 # 2D Scan over Random Concentrations of Two Species 
-Very similarly we will now scan over random concentrations of two species. This implements an example from the [Mendes 2009 paper](https://link.springer.com/protocol/10.1007%2F978-1-59745-5) on COPASI use cases. 
+Very similarly we will now scan over random concentrations of two species. This implements an example from the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2) [^2] on COPASI use cases. 
 
 We will load the model, set the steady state settings, and save our model as a string to load it in parallel later.
 
@@ -180,3 +177,7 @@ At the end we can again unload the model to free up memory.
 ```{r}
 unloadModel()
 ```
+
+## References
+[^1]: Kent, Edward, Stefan Hoops, and Pedro Mendes. "Condor-COPASI: high-throughput computing for biochemical networks." BMC systems biology 6.1 (2012): 91.
+[^2]: Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. https://doi.org/10.1007/978-1-59745-525-1_2

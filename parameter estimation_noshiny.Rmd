@@ -1,10 +1,8 @@
 ---
 title: "Parameter Estimation"
-author: "Johanna Daas"
-date: "5 12 2020"
+author: "Johanna Daas, Jonas Förster"
 output: html_document
-runtime: shiny
-toc_float: TRUE
+
 ---
 ```{r, message = FALSE, include = FALSE}
 library(CoRC)
@@ -18,100 +16,21 @@ You can see a *Timecourse* of the species of the model below. The points are mea
 data <- read.table("MAPKdata1.txt", header = TRUE)
 loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml") 
 
-
-param_before <- getParameters()$value
-vs <- which(substr(getParameters()$name,1,1) == "V")
-
-
-fluidRow(
-    
-    column(2,    
-    sliderInput("V1",
-              label = as.character(getParameters()$key[vs[1]]),
-              min = 0.1 * getParameters()$value[vs[1]],
-              max = 1.9 * getParameters()$value[vs[1]],
-              value = getParameters()$value[vs[1]],
-              step = 0.1),
-    
-    sliderInput("V2",
-              label = as.character(getParameters()$key[vs[2]]),
-              min = 0.1 * getParameters()$value[vs[2]],
-              max = 1.9 * getParameters()$value[vs[2]],
-              value = getParameters()$value[vs[2]],
-              step = 0.1),
-    ),
-    column(2,
-   sliderInput("V5",
-              label = as.character(getParameters()$key[vs[3]]),
-              min = 0.1 * getParameters()$value[vs[3]],
-              max = 1.9 * getParameters()$value[vs[3]],
-              value = getParameters()$value[vs[3]],
-              step = 0.1),
-    
-    sliderInput("V6",
-              label = as.character(getParameters()$key[vs[4]]),
-              min = 0.1 * getParameters()$value[vs[4]],
-              max = 1.9 * getParameters()$value[vs[4]],
-              value = getParameters()$value[vs[4]],
-              step = 0.1),
-    ),
-   column(2,
-    sliderInput("V9",
-              label = as.character(getParameters()$key[vs[5]]),
-              min = 0.1 * getParameters()$value[vs[5]],
-              max = 1.9 * getParameters()$value[vs[5]],
-              value = getParameters()$value[vs[5]],
-              step = 0.1),
-    
-    sliderInput("V10",
-              label = as.character(getParameters()$key[vs[6]]),
-              min = 0.1 * getParameters()$value[vs[6]],
-              max = 1.9 * getParameters()$value[vs[6]],
-              value = getParameters()$value[vs[6]],
-              step = 0.1)
-   )
-
-    
-           )
-
-
-
-renderPlot({
-  #i have no idea why i have to call this again...
-  loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml") 
-
-  
-      v_par <- (c(input$V1, input$V2,
-                  input$V5, input$V6,
-                  input$V9, input$V10))
+data_print <- data %>% pivot_longer(-Time, names_to = "names", values_to = "values")
       
-      setParameters(key = getParameters()$key[vs],
-                value = v_par)
+tc_print <- runTC(duration = 1000, dt = 1)$result %>%
+  pivot_longer(-Time, names_to = "names", values_to = "values")
       
-      data_print <- data %>% pivot_longer(-Time, names_to = "names", values_to = "values")
-      
-      tc_print <- runTC(duration = 1000, dt = 1)$result %>%
-        pivot_longer(-Time, names_to = "names", values_to = "values")
-      
-      ggplot()+
-        geom_point(data = data_print, aes(x = Time, y = values, color = names))+
-        geom_line(data = tc_print, aes(x = Time, y = values, color = names))
-})
-
-
+ggplot()+
+  geom_point(data = data_print, aes(x = Time, y = values, color = names))+
+  geom_line(data = tc_print, aes(x = Time, y = values, color = names))
 
 
 ```
-```{r, echo = FALSE}
-setParameters(key = getParameters()$key, value = param_before)
-```
-As you can see, the model does not describe the data perfectly. You can try to get a better result and change the reaction speeds by using the slider.
-
-
-
+As you can see, the model does not describe the data perfectly. We will try and get a better result by changing the parameters of our model.
 
 # Parameter estimation
-What you just did (or tried to do) was to find the parameters that make the model describe the data best. This is, what we call *Parameter Estimation*. As you could see, it was nearly impossible to find the combination of parameters that do that best. That is why we use algorithms that find the best fitting parameters.
+We want to find the parameters of our model that describe the data best. We call this *Parameter Estimation*. We have 22 parameters in our model, so finding the right combination of parameters by chance and just trying out is nearly impossible. Even only using a limited subset of these parameters (as we will do) will not work that way. We will use *algorythms* for that.
 
 
 Parameter estimation is an important topic when handling a model. In **CoRC** you have to 
