@@ -1,9 +1,7 @@
 ---
 title: "Oscillations - Teaching material"
-author: "Johanna Daas"
-date: "4 12 2020"
+author: "Johanna Daas, Jonas Förster"
 output: html_document
-runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -19,7 +17,7 @@ If you need help, click on the "Hint" tab. There we will give you some pointers 
 
 If you are completely lost, you can take a look at the "Solution" tab. Here we will give you the completed code with explanations on why it is working. Of course you can use the Solution tab to check if your result is correct. But don't worry, if your code does not look like ours. If it achieves the same result, it is probably also true. But it can't hurt to take a look at where your solution is different from ours and to try and understand, why we did what we did.
 
-We assume that you already know how to work with **CoRC** a bit or have gone through our [examples](http://www.google.com) LINK!. Also it would help, if you have already some experience with ggplot, but that is not necessary.
+We assume that you already know how to work with **CoRC** a bit or have gone through our [examples](https://jpahle.github.io/CoRC/index.html). Also it would help, if you have already some experience with ggplot, but that is not necessary.
 
 
 
@@ -81,7 +79,7 @@ And done! We set up our worksheet :)
 
 <!-- Load model -->
 #  Loading the model {.tabset .tabset-pills}
-This implementation is an example from the Condor-Copasi paper LINK!
+This implementation is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91)[^1]!
 You can find the model here:
 ```{r}
 loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
@@ -180,7 +178,7 @@ Now, the question presents itself: How and why does this model oscillate? And wh
 
 To answer the last question first, oscillators are fascinating because a lot of fascinating signalling pathways in biology oscillate. You can think about why that might have some sort of evolutionary advantage. What is in our environment that changes over time in an oscillating way?
 
-The first thing that might come to mind is our day-and-night-cycle. And indeed, we find oscillating signalling pathways here. Even without external stimuli these oscillation prevail. For example, one of biologist's favourite pet, the fruit fly *Drosophila melanogaster* has the proteins PER (short for *period*) and TIM (short for *timeless*) that act as their "clock"  (Tyson, 1999)
+The first thing that might come to mind is our day-and-night-cycle. And indeed, we find oscillating signalling pathways here. Even without external stimuli these oscillation prevail. For example, one of biologist's favourite pet, the fruit fly *Drosophila melanogaster* has the proteins PER (short for *period*) and TIM (short for *timeless*) that act as their "clock"  (Tyson, 1999)[^2]
 
 The fist question is a bit harder to answer.
 
@@ -190,7 +188,7 @@ Take a look at our oscillating model below:
 ### final predator prey model
 
 ```
-This is a representation of a so called predator-prey model from Lotka-Volterra (DATE!)
+This is a representation of a so called predator-prey model from Lotka-Volterra [^3]
 We will build the model in the following tasks.
 
 <!-- Species -->
@@ -374,7 +372,7 @@ ggplot(data = timecourse_long, aes(x = Time, y = Concentration, color = Species)
 And we just made our own, oscillating model! But why and how does our model oscillate?
 
 
-In a helpful review from Novák and Tyson (2008) we find the following requirements for oscillators:
+In a helpful review from Novák and Tyson [^4] we find the following requirements for oscillators:
 
 1. Negative feedback to carry a reaction network back to the 'starting point' of oscillation
 2. Negative feedback signal sufficiently delayed in time so we don't get a steady state
@@ -391,7 +389,7 @@ We can try and explain how our model oscillates by going through those point by 
 
 
 # 3D-Oscillations {.tabset .tabset-pills}
-We will now take a look at another model. This model is about oscillaitons in alcium signalling [(Kummer, 2000)](https://www.ebi.ac.uk/biomodels-main/Biomd0000000329). This model has three species: **G-alpha**, **activePLC** and **Calcium**. All three of these species can oscillate, so we can visualize this in a 3D-plot. 
+We will now take a look at another model. This model is about oscillaitons in calcium signalling [(Kummer, 2000)](https://www.ebi.ac.uk/biomodels/BIOMD0000000329) [^5]. This model has three species: **G-alpha**, **activePLC** and **Calcium**. All three of these species can oscillate, so we can visualize this in a 3D-plot. 
 
 But first, we need to load our model and create a timeseries. We will use a duration of 24, which is 2 Periods with 10000 intervals.
 
@@ -572,11 +570,11 @@ multiple3d <- plot_ly(data = tc,
 multiple3d
 ```
 
+## References 
+[^1]: Kent, Edward, Stefan Hoops, and Pedro Mendes. "Condor-COPASI: high-throughput computing for biochemical networks." BMC systems biology 6.1 (2012): 91.
+[^2]: Tyson, John J., et al. "A simple model of circadian rhythms based on dimerization and proteolysis of PER and TIM." Biophysical journal 77.5 (1999): 2411-2417.
+[^3]: HIER BRAUCHE ICH NOCH EINE QUELLE!
+[^4]: Novák, Béla, and John J. Tyson. "Design principles of biochemical oscillators." Nature reviews Molecular cell biology 9.12 (2008): 981-991.
+[^5]: Kummer, Ursula, et al. "Switching from simple to complex oscillations in calcium signaling." Biophysical journal 79.3 (2000): 1188-1195.
 
 
-###################
-# Name {.tabset .tabset-pills}
-## Code
-## Hint
-## Solution
-# {-}
