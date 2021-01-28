@@ -1,2 +1,7 @@
+---
+permalink: _site/index.html
+---
+
+
 These are the docs for the page.
 Tried to create a pretty webpage with rmarkdown. Locally it works, but i cant get it working on github pages :(
