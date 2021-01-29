@@ -1,24 +1,35 @@
 ---
 title: "Michaelis Menten Kinetics"
+author: Johanna Daas
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.asp = 10/16,
+  out.width = "100%",
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+set.seed(1)
 ```
+
 # Setup
 The code in this teaching document uses the **R** packages [**CoRC**](https://jpahle.github.io/CoRC/index.html) and [**tidyverse**](https://www.tidyverse.org/). Make sure they are installed before beginning.
 
-```{r, verbose = FALSE}
+```{r, massage = FALSE}
 library(CoRC)
 library(tidyverse)
 ```
 
 # Introduction
 
-Michaelis-Menten-Kinetics, introduced by Leonor Michaelis and Maud Menten (1913) is a popular model of enzyme kinetics.
+Michaelis-Menten-Kinetics, introduced by Leonor Michaelis and Maud Menten[^1] is a popular model of enzyme kinetics.
 
-If you have a substrate $S$ and product $P$ and the reaction is catalysed by enzyme $E$, you *can* use Michaelis-Menten-Kinetics to discribe this process. The rate of formation  of the product ($v$) is  given by 
+If you have a substrate $S$ and product $P$ and the reaction is catalysed by enzyme $E$, you *can* use Michaelis-Menten-Kinetics to describe this process. The rate of formation  of the product ($v$) is  given by 
 
 $$ 
 v = \frac{V_{max} * [S]}{K_M + [S]}
@@ -26,17 +37,17 @@ $$
 with $V_{max}$ as the maximum rate of product formation (at saturating substrate concentration) and $K_M$ the value of the Michaelis-Constant.
 
 # Derivation
-Michaelis-Menten kinetics follow the assumtion that enzyme-catalysed reaction follow a two step process
+Michaelis-Menten kinetics follow the assumption that enzyme-catalyzed reaction follow a two step process
 $$ 
 S + E \rightleftharpoons SE \rightarrow E + P
 $$
-where the substrate and the enzyme reversibly form a complex $SE$ (with parameters $k_f$ and $k_r$ for forward and reverse reactions) which then catalyses the formation of the product and the release of the enzyme (with reaction parameter $k_{cat}$).
+where the substrate and the enzyme reversibly form a complex $SE$ (with parameters $k_f$ and $k_r$ for forward and reverse reactions) which then catalyzes the formation of the product and the release of the enzyme (with reaction parameter $k_{cat}$).
 
 In this model, all our reaction follow *Mass-action kinetics* where the reaction rate is proportional to the concentration of the substrates.
 
 We can denote our reaction rates for the two reaction as following:
 
-1.) $k_f*([S]+E) - k_r*[SE]$
+1.) $k_f*([S]+[E]) - k_r*[SE]$
 
 2.) $k_{cat}*[SE]$
 
@@ -51,7 +62,7 @@ $$\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] - k_{cat}[SE] $$
 $$\frac{d[P]}{dt} = k_{cat}[SE]$$
 
 
-Another important assumtion is, that the concentration of the substrate is much higher than the concentration of the enzyme.
+Another important assumption is, that **the concentration of the substrate is much higher than the concentration of the enzyme**.
 
 ## Model in CoRC
 We can visualize this model using *CoRC*:
@@ -62,7 +73,7 @@ newModel()
 setModelName("Manual Michaelis Menten")
 ```
 Next, we can put in our reactions. Species that are called in the reaction creation and not yet part of the model, will be added automatically. We can denote reversible reactions with an "=" sign, and non-reversible reactions with an arrow "->".
-Hint: Make sure that all species and operators are separated by a space, otherwise **CoRC** will not see them as different species/things.
+Hint: Make sure that all species and operators are separated by a space, otherwise **CoRC** will not see them as distinct species/things.
 ```{r}
 newReaction("S + E = SE")
 newReaction("SE -> P + E")
@@ -74,13 +85,13 @@ getSpecies()
 getReactions()
 getReactions()$rate_law
 ```
-As you can see, the species in the model all start with a concentration of 1. This obviously does not make sense for our model, because at the beginning, we don't want there to be any complex or product. Also, we will need to make sure that there is a lot more substrate than complex. The reactions look fine; the rate law is automatically set to Mass Action Kinetics, which is (As you will see below) needed for Michaelis-Menten Kinetics.
+As you can see, the species in the model all start with a concentration of 1. This obviously does not make sense for our model, because at the beginning, we don't want there to be any complex or product. Also, we will need to make sure that there is a lot more substrate than complex (as this is one of the assuptions). The reactions look fine; the rate law is automatically set to Mass Action Kinetics, which is (as you will see below) needed for Michaelis-Menten Kinetics.
 
 ```{r}
 setSpecies(key = getSpecies()$key, initial_concentration = c(1,20,0,0))
 ```
 Now, we want to know how our model behaves. 
-For this, we will simulate how our species interact with each other in a *time course*. The runTimeCouse() command gives us a list with a lot of different aspects, but for now only the "result" section is interesting to us.
+For this, we will simulate how our species interact with each other in a *time course*. The runTimeCouse() command gives us a list with a lot of different aspects, but for now, only the "result" section is interesting to us.
 
 ```{r}
 timecourse <- runTimeCourse(duration = 1000, dt = 1)$result
@@ -99,10 +110,10 @@ ggplot(data = timecourse, mapping = aes(x = Time, y = Concentration, color = Spe
 
 ```
 
-There are two ways of deriving the Michaelis-Menten Kinetics from here. The *Quasi-Steady-State Assumption* and the *Equilibirum approximation*. You have to keep in mind, that both of these have underlying assumtions that need not nessecarliy be true for your model. Here, we will discuss the Quasi-steady-state assumption further. 
+There are two ways of deriving the Michaelis-Menten Kinetics from here. The *Quasi-Steady-State Assumption* and the *Equilibirum approximation*. You have to keep in mind, that both of these have underlying assumptions that need not necessarily be true for your model.  
 
 ## Quasi-steady-state Assumption
-The approximation taken in this assumption is, that the **concentration of the complex is in steady state** (at least in the time scale of product formation that we are interested in). 
+The approximation taken in this assumption is, that the **concentration of the complex is in steady state** (at least in the time scale of product formation that we are interested in). This derivation was proposed by Briggs and Heldane [^2] and is a bit more intuitive than the original (below).
 
 So, we assume the concentration of the complex does not change over time.
  $$\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] - k_{cat}[SE] = 0 $$
@@ -145,12 +156,12 @@ Finally, when we insert this in our reaction velocity, we get the Michaelis-Ment
 $$v = \frac{V_{max}[S]}{K_M + [S]} $$
 
 ## Equilibrium approximation
-Alternatively, we can reach these kinetics by applying an Equilibrium approximation, where we assume that the **substrate is in chemical equilibrium with the complex**. We assume that the forward reaction is equal to the backwards reaction:
+Alternatively, we can reach these kinetics by applying an Equilibrium approximation, where we assume that the **substrate is in chemical equilibrium with the complex**. This was the original derivation from Leonor Michaelis and Maud Menten.  We assume that the forward reaction is equal to the backwards reaction:
 
 $$k_f[S][E] = k_r[SE]$$
 The derivation of the Michaelis-Menten kinetics from this is similar to above, so we will not do that.
 
-# More code
+# Comparing models
 Now, we want to show how our Michaelis-Menten-Kinetics work. For this, we will plot the substrate and product concentration of our model next to the substrate and product concentration of a model with inbuilt Michaelis-Menten-Kinetics that looks like this:
 
 $$ S \rightarrow P $$
@@ -187,7 +198,7 @@ getSpecies(model = manualMM)
 The total enzyme concentration $E_0$ is defined as
 
 $$ [E_0] = [E] + [SE] = 1 + 0 = 1$$
-and it follows for $V_max$
+and it follows for $V_{max}$
 $$ V_{max} = [E_0] * k_{cat} = 1 * 0.1 = 0.1 $$
 We can set these parameters for our inbuilt Michalis Menten model, as well as set the species starting concentration so that they are the same as for the manual model:
 ```{r}
@@ -279,3 +290,6 @@ $$ \frac{dP}{dt} = k_{cat}[SSE] $$
 
 $$ \frac{dE}{dt} = -k_{f1}[S_1][E] + k_{cat}[SSE]$$
 
+## References
+[^1]: L. Menten, M. Michaelis, Die Kinetik der Invertinwirkung, Biochem Z49 (333-369) (1913) 5
+[^2]: George Edward Briggs, John Burdon Sanderson Haldane; A Note on the Kinetics of Enzyme Action. Biochem J 1 January 1925; 19 (2): 338–339. doi: https://doi.org/10.1042/bj0190338

@@ -3,7 +3,19 @@ title: "Parallel processing with CoRC"
 author: "Jonas Förster, Johanna Daas"
 output: html_document
 ---
-
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.asp = 10/16,
+  out.width = "100%",
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+set.seed(1)
+```
 
 ```{r,  message = FALSE}
 library(tidyverse)
@@ -82,7 +94,7 @@ head(plotdata)
 ```
 
 Now, we will plot the data:
-```{r}
+```{r, message = FALSE}
 plot <-
   ggplot(data = plotdata, aes(x = Time, y = mean, group = species, tt_sd = sd)) +
   geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd, fill = species), alpha = 1 / 4) +
@@ -156,7 +168,7 @@ scan <-
 
 Now we can reshape and plot the data:
 
-```{r}
+```{r, message = FALSE}
 plotdata <-
   scan %>%
   bind_rows() %>%

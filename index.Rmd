@@ -1,0 +1,12 @@
+---
+title: "Dynamic Publications with CoRC"
+---
+This website supplements the paper on dynamic publications with CoRC. You can read the paper [here](www.google.com) but the documents on this page work also without the context given there.
+
+# Dynamic Publication Media
+Dynamicly published documents (instead of static ones like books and papers)  offer a wide range of advantages. 
+We wanted to focus on three different main applications for these document: **Documentation**, **Teaching** and **Science Communication**. The documents provided for this paper are found on this page.
+
+# CoRC
+If you want to learn about CoRC, you can do so [here](https://jpahle.github.io/DynamicPublicationMediaManuscript/corc.html) or if you want to start with coding right away you can use our beginner friendly document on [opimization](https://jpahle.github.io/DynamicPublicationMediaManuscript/optimization.html) or if you are already familiar with COPASI and model building and want to see what CoRC can do, look at our example on [Parallel Processing](https://jpahle.github.io/DynamicPublicationMediaManuscript/parallel.html).
+

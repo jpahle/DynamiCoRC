@@ -3,11 +3,21 @@ title: "Oscillations - Teaching material"
 author: "Johanna Daas, Jonas Förster"
 output: html_document
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.asp = 10/16,
+  out.width = "100%",
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+set.seed(1)
 library(tidyverse)
 ```
+
 # Introduction
 Why are oscillations so fascinating for science? You will find an answer to that question (hopefully), as well as learn how to code with **CoRK**. 
 
@@ -364,6 +374,7 @@ Now we have everything we need for ggplot. We call the *ggplot()* function. As d
 ggplot(data = timecourse_long, aes(x = Time, y = Concentration, color = Species))+
   geom_line()
 ```
+
 # {-}
 
 

@@ -1,18 +1,29 @@
 ---
 title: "Optimization"
 author: "Johanna Daas"
-date: "10 12 2020"
 output: html_document
 ---
-
-This document follows closely the [Mendez 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.asp = 10/16,
+  out.width = "100%",
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+set.seed(1)
+```
+This document follows closely the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
 
 If we want to optimize something, we either want to *minimize* or *maximize* a specific task value.
 
 # Setup
 First, we have to load **CoRC** and **tidyverse**. Make sure you have these packages downloaded.
 
-```{r}
+```{r, message = FALSE}
 library(CoRC)
 library(tidyverse)
 ```
