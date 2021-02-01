@@ -3,6 +3,7 @@ title: "Oscillations - Teaching material"
 author: "Johanna Daas, Jonas Förster"
 output: html_document
 ---
+
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -19,52 +20,81 @@ library(tidyverse)
 ```
 
 # Introduction
-Why are oscillations so fascinating for science? You will find an answer to that question (hopefully), as well as learn how to code with **CoRK**. 
 
-This is a teaching document. Whenever there is some code chunk, you can run it. But (as you will quickly see), it will not be completed. Some of the code will need to be put in by you to get to the next result. but don't worry: We will guide you through everything. Don't be shy to be creative with your coding - it is all learning by doing. 
+Why are oscillations so fascinating for science?
+Here, you will find an answer to that question (hopefully), as well as learn how to code with **CoRC**. 
 
-If you need help, click on the "Hint" tab. There we will give you some pointers on where to look, as well as some extra code guide you in the right direction. But it is always a good idea to use google as well if you don't know how a certain function works. You can also use the intrinsic help-function of **R**: ?function gives you the documentation for that function. If you forgot the specific name, you can also use ??function for fuzzy search.
+This is a teaching document.
+Whenever there is a code chunk, you can run it.
+But (as you will quickly see), it will not be completed.
+Some of the code, you will have to put in by yourself to get to the next result.
+But don't worry: We will guide you through everything.
+Don't be shy to be creative with your coding - it is all learning by doing.
 
-If you are completely lost, you can take a look at the "Solution" tab. Here we will give you the completed code with explanations on why it is working. Of course you can use the Solution tab to check if your result is correct. But don't worry, if your code does not look like ours. If it achieves the same result, it is probably also true. But it can't hurt to take a look at where your solution is different from ours and to try and understand, why we did what we did.
+If you need help, click on the "Hint" tab.
+There we will give you some pointers on where to look, as well as some extra code guide you in the right direction.
+But it is always a good idea to use google as well if you don't know how a certain function works.
+You can also use the intrinsic help-function of **R**:
+The `?` function gives you the documentation for that function.
+If you forgot the specific name, you can also use the `??` bfunction for fuzzy search.
 
-We assume that you already know how to work with **CoRC** a bit or have gone through our [examples](https://jpahle.github.io/CoRC/index.html). Also it would help, if you have already some experience with ggplot, but that is not necessary.
+If you are completely lost, you can take a look at the "Solution" tab.
+Here we will give you the completed code with explanations on why it is working.
+Of course you can use the Solution tab to check if your result is correct.
+But don't worry, if your code does not look like ours.
+If it achieves the same result, it is probably also true.
+But it can't hurt to take a look at where your solution is different from ours and to try and understand, why we did what we did.
 
-
+We assume that you already know how to work with **CoRC** a bit or have gone through our [examples](https://jpahle.github.io/CoRC/index.html).
+Also, it would help if you already have some experience with ggplot, but that is not a necessity.
 
 ## Getting used to our system {.tabset .tabset-pills}
 ### Code
-This is an example on how our tabs work. You can click on the others to get help or take a look at our solution.
+This is an example on how our tabs work.
+You can click on the others to get help or take a look at our solution.
 
 ### Hint
-You successfully clicked on our "Hint" tab. I don't think that you need help navigating these tabs.
+You successfully clicked on our "Hint" tab.
+I don't think that you need help navigating these tabs.
 
 ### Solution
-This is our Solution tab. If you clicked on it and this message is showing, everything is working as it should. Now, on with the coding!
+This is our Solution tab.
+If you clicked on it and this message is showing, everything is working as it should.
+Now, on with the coding!
 
 ## {-}
 
 <!-- Setup -->
 
 # Setup {.tabset .tabset-pills}
-To set up our work with **CoRC**, we first need to install it and tell **R** that we will be using it. For this, we will call the library() function. 
+To set up our work with **CoRC**, we first need to install it and tell **R** that we will be using it.
+For this, we will call the `library()` function. 
 
 ## Code
 ```{r}
 # Your code here
 ```
-It is good practice to set up all libraries at the beginning of your document and not at the point where you first need it. This avoids confusion. So we will also need to tell **R** about the other packages  we will be using: **ggplot2** and **plotly**.
+
+It is good practice to set up all libraries at the beginning of your document and not at the point where you first need it.
+This avoids confusion.
+So we will also need to tell **R** about the other packages.
+We will be using: **ggplot2** and **plotly**.
 
 ## Hint
-You need to call the library() function with the package you want to call as an *argument*.
+You need to call the `library()` function with the package you want to call as an *argument*.
 
 You also need to make sure to have the package installed before calling it with the library function.
-If you are unsure if you have the required packages installed, you can check by using find.package(). If you have the package installed, it will tell you where it is installed.
+If you are unsure if you have the required packages installed, you can check by using `find.package()`.
+If you have the package installed, it will tell you where it is installed.
+
 ```{r}
 find.package("CoRC")
 ```
 
 ## Solution
+
 You first need to install the packages **CoRC** and **ggplot**. 
+
 ```{r}
 # #Install CoRC. 
 # install.packages("remotes")
@@ -77,20 +107,25 @@ You first need to install the packages **CoRC** and **ggplot**.
 # #Install plotly
 # install.packages("plotly")
 ```
-Now, we want to call both of these packages with the library function:
+
+Now, we want to call both of these packages with the `library()` function:
+
 ```{r}
 library(CoRC)
 library(ggplot2)
 library(plotly)
 ```
+
 And done! We set up our worksheet :)
 
 # {-}
 
 <!-- Load model -->
 #  Loading the model {.tabset .tabset-pills}
+
 This implementation is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91)[^1]!
 You can find the model here:
+
 ```{r}
 loadModel("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/stochastic_test.cps")
 # loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
@@ -110,7 +145,9 @@ To look at the species we type:
 ```{r}
 getSpecies()
 ```
+
 and to look at the reactions
+
 ```{r}
 getReactions()
 ```
@@ -119,20 +156,22 @@ getReactions()
 
 
 # Visualizing species {.tabset .tabset-pills}
+
 We want to show how species "a" behaves over time. For this, we first have to run a Time course. 
 
 ```{r}
 timecourse <- runTimeCourse()$result
 
 timecourse
-
 ```
+
 ## Code
 Fill in the missing code!
-```{r}
-# ggplot(data = ) +
-#   geom_line(aes(x = , y =))
+```{r, eval = FALSE}
+ggplot(data = ) +
+  geom_line(aes(x = , y =))
 ```
+
 (You have to get rid of the # to uncomment and run the code. If you mark several lines with your pointer and press ctrl+shift+c you can comment/uncomment several lines at once.)
 
 ## Hint
@@ -156,7 +195,7 @@ ggplot(data = timecourse)+
 Now, can you do the same for b and c?
 
 ## Code
-```{r}
+```{r, eval = FALSE}
 #Your code here
 ```
 
@@ -164,15 +203,20 @@ Now, can you do the same for b and c?
 Take a look at the code for visualizing a and think about what is the same and what is different for b and c.
 
 ## Solution
-What we have to change about the code form above is the part telling ggplot what we want to have on our y axis. In the last plot, we wanted a there and now we want b or c.
+What we have to change about the code form above is the part telling ggplot what we want to have on our y axis.
+In the last plot, we wanted a there and now we want b or c.
 
-For b this will look like this:
+For b, this will look like this:
+
 ```{r}
 ggplot(data = timecourse) +
   geom_line(aes(x = Time, y = b))
 ```
 
-Of course, we can put all species in one plot. To see which species are which, we will also color the lines. We can tell ggplot implicitly to color "a" different than "b" by calling the color "a" or "b". Of course you can also explicitly tell which color to use by saying "color = 'red'" (after the aes()command) for example.
+Of course, we can put all species in one plot.
+To see which species are which, we will also color the lines.
+We can tell ggplot implicitly to color "a" different than "b" by calling the color "a" or "b".
+Of course you can also explicitly tell which color to use by saying "color = 'red'" (after the `aes()` command) for example.
 
 ```{r}
 ggplot(data = timecourse) +
@@ -187,9 +231,14 @@ ggplot(data = timecourse) +
 
 Now, the question presents itself: How and why does this model oscillate? And why does it matter? 
 
-To answer the last question first, oscillators are fascinating because a lot of fascinating signalling pathways in biology oscillate. You can think about why that might have some sort of evolutionary advantage. What is in our environment that changes over time in an oscillating way?
+To answer the last question first, oscillators are fascinating because a lot of fascinating signalling pathways in biology oscillate.
+You can think about why that might have some sort of evolutionary advantage.
+What is in our environment that changes over time in an oscillating way?
 
-The first thing that might come to mind is our day-and-night-cycle. And indeed, we find oscillating signalling pathways here. Even without external stimuli these oscillation prevail. For example, one of biologist's favourite pet, the fruit fly *Drosophila melanogaster* has the proteins PER (short for *period*) and TIM (short for *timeless*) that act as their "clock"  (Tyson, 1999)[^2]
+The first thing that might come to mind is our day-and-night-cycle.
+And indeed, we find oscillating signalling pathways here.
+Even without external stimuli these oscillation prevail.
+For example, one of biologists' favorite pet, the fruit fly *Drosophila melanogaster* has the proteins PER (short for *period*) and TIM (short for *timeless*) that act as their "clock" (Tyson, 1999)[^2].
 
 The fist question is a bit harder to answer.
 
@@ -199,24 +248,27 @@ Take a look at our oscillating model below:
 ### final predator prey model
 
 ```
-This is a representation of a so called predator-prey model from Lotka-Volterra [^3]
+This is a representation of a so called predator-prey model from Lotka-Volterra [^3].
 We will build the model in the following tasks.
 
 <!-- Species -->
 
 
 # Species {.tabset .tabset-pills}
-We call the elements in our model "species". Here, this is even more true. We will have two species, "Cats" and "Mice". 
+We call the elements in our model "species".
+Here, this is even more true.
+We will have two species, "Cats" and "Mice". 
 
 We will first have to create a new model and then our two species.
 
 ## Code
-```{r}
+```{r, eval=FALSE}
 #Your code here
 ```
 
 ## Hint
-To create something new, we use the *new* family of functions. Just try it, RStudio tries to autofill your functions, so you might find what you need like that.
+To create something new, we use the *new* family of functions.
+Just try it, RStudio tries to autofill your functions, so you might find what you need like that.
 
 ## Solution
 ```{r}
@@ -227,6 +279,7 @@ newModel()
 newSpecies("Cats")
 newSpecies("Mice")
 ```
+
 # {-}
 
 <!-- Functions -->
@@ -248,7 +301,9 @@ Remember, Cats need Mice to multiply!
 
 ## Hint
 
-We want to create a reaction for breeding and one for dying. For mice this might look like this:
+We want to create a reaction for breeding and one for dying.
+For mice this might look like this:
+
 ```{r}
 #Cats being born:
 newReaction("Mice -> 2 * Mice")
@@ -256,6 +311,7 @@ newReaction("Mice -> 2 * Mice")
 #Cats dying:
 newReaction("Mice ->")
 ```
+
 For the Cats it looks similar, but remember, Cats need to eat. 
 
 ## Solution
@@ -264,45 +320,57 @@ For the Cats it looks similar, but remember, Cats need to eat.
 unloadModel()
 newModel()
 ```
-When creating a reaction, we need to use the *newReaction()* function.
+
+When creating a reaction, we need to use the `newReaction()` function.
 
 For the "dying"-functions, we tell **CoRC** that there was something there and then it isn't there anymore:
+
 ```{r}
 newReaction("Cats -> ")
 newReaction("Mice -> ")
 ```
 
-For more mice we need mice in the first place, so a similar " -> Mice" won't work, even if this is possible in **CoRC**. This would be the case if we have a constant migration of mice into our space.
+For more mice we need mice in the first place, so a similar " -> Mice" won't work, even if this is possible in **CoRC**.
+This would be the case if we have a constant migration of mice into our space.
 Instead we will multiply mice and cats, while cats also need to eat mice in order to multiply:
+
 ```{r}
 newReaction("Mice -> 2 * Mice")
 newReaction("Cats + Mice -> 2 * Cats")
 ```
-Because we are dealing in concentrations (in our example that would be mice / square meter or something similar) we can say that one mouse can create two mice, even if that doesn't necessarily make sense.
+
+Because we are dealing in concentrations (in our example that would be mice / square meter or something similar) we can say that one mouse can create two mice, even if that doesn't model reality very faithfully.
+
 # {-}
 
 # Parameters of our model: {.tabset .tabset-pills}
 
-If we take a look at our model now
+If we take a look at our model now:
+
 ```{r, include = FALSE}
 plot <- runTC(duration = 1000)$result %>%
   pivot_longer(-Time, names_to = "Species", values_to = "Concentration")
 
-ggplot()+
+ggplot() +
   geom_line(data = plot, aes(x = Time, y = Concentration, color = Species))
-
 ```
-we see, that is does not yet behave in a way we want it to. This is because we still need to take a look at the parameters of our model.
 
-Most obviously we can see that it probably does not make sense to start with our two species at the same concentration. In nature we find that usually there is an overabundance of prey over predators, otherwise at some point we would not find any more mice.
+we see, that is does not yet behave in a way we want it to.
+This is because we still need to take a look at the parameters of our model.
+
+Most obviously we can see that it probably does not make sense to start with our two species at the same concentration.
+In nature we find that usually there is an overabundance of prey over predators, otherwise at some point we would not find mice anymore.
 
 So let us fix that:
 We can take a look at our *species* like this:
+
 ```{r}
 getSpecies()
 ```
 
-and then set the value we want with the *set* command. For the *key* argument in the *setSpecies()* function we want all keys available, because we want to set all species. We can do this like this:
+and then set the value we want with the *set* command.
+For the *key* argument in the *setSpecies()* function we want all keys available, because we want to set all species.
+We can do this like this:
 
 ```{r}
 setSpecies(key = getSpecies()$key, initial_concentration = c(0.1, 10))
@@ -311,12 +379,14 @@ setSpecies(key = getSpecies()$key, initial_concentration = c(0.1, 10))
 We can do something similar for our parameters. 
 
 ## Code
-```{r}
+```{r, eval=FALSE}
 # Take a look at the parameters and change them to what you think is a good value.
 ```
 
 ## Hint
-First, we need to look at our parameters. Try doing that similarly how we looked at the species. The setting of the parameters also similar to how we set our species.
+First, we need to look at our parameters.
+Try doing that in a similar fashion to how we looked at the species.
+The setting of the parameters also similar to how we set our species.
 
 For which value to use, think about how fast reactions should be compared to the others.
 
@@ -325,54 +395,77 @@ First, let us take a look at our parameters.
 ````{r}
 getParameters()
 ```
-We can see that all parameters have the same value. This does not really make sense. We can assume that Mice probably multiply faster than cats; and that cats have a longer lifespan than mice. So we will set our parameters to 0.01 for Cats dying and 0.1 for Cats multiplying as well as 0.2 for Mice multiplying and 0.02 for mice dying.
+
+We can see that all parameters have the same value.
+This does not really make sense.
+We can assume that mice probably multiply faster than cats; and that cats have a longer lifespan than mice.
+So we will set our parameters to 0.01 for Cats dying and 0.1 for Cats multiplying as well as 0.2 for Mice multiplying and 0.02 for mice dying.
 
 We can set these values similarly to how we set the species:
 
 ```{r}
 setParameters(key = getParameters()$key, value = c(0.01, 0.02, 0.2, 0.1))
 ```
+
 If you do not understand how we can use this expression to set the *key* argument, try running it alone.
 
 # {-}
 
 # {.tabset .tabset-pills}
 
-We can now take a look at how our model behaves. Try making the plot yourself.
+We can now take a look at how our model behaves.
+Try making the plot yourself.
 
 
 ## Code
-```{r}
+```{r, eval=FALSE}
 # Make a plot
 ```
 
 ## Hint
-We already made a plot above. We need to run a timecourse to get our points for the plot and then use ggplot for plotting. This time, we also need colors; so take a look at the *color* argument of the ggplot *aes()* function, where we specified *x* and *y*.
+
+We already made a plot above.
+We need to run a timecourse to get our points for the plot and then use ggplot for plotting.
+This time, we also need colors; so take a look at the `color` argument of the ggplot `aes()` function, where we specified *x* and *y*.
 
 ## Solution
 
-First, we will run a timecourse. We set the duration of the timecourse to 1000
+First, we will run a timecourse.
+We set the duration of the timecourse to 1000
+
 ```{r}
 timecourse <- runTimeCourse(duration = 1000)
 ```
 
-If you take a look at the *timecourse* variable by typing the variable in your console we can see that it is a list of a lot of different points. We are only interested in the *result* part. You can subset lists in **R** with the *$* operator.
+If you take a look at the *timecourse* variable by typing the variable in your console we can see that it is a list of a lot of different points.
+We are only interested in the `result` part.
+You can subset lists in **R** with the `$` operator.
 
 ```{r}
 timecourse <- timecourse$result
 ```
 
-This is now a table of our species, but ggplot needs all values to be in one column and any differentiation between them (in our case the species and time) in another column. This is also called the *long* format of tables. We can use the *pivot_longer()* command to easily transfer all we need. Time is already in a seperate column, so we do not need to do anything with it. We can do that with *-Time*. We use the *names_to* argument to specify how we would like to call the column where the names for the old columns should go; the *values_to* argument does the same but for values.
+This is now a table of our species, but ggplot needs all values to be in one column and any differentiation between them (in our case the species and time) in another column.
+This is also called the *long* format of tables.
+We can use the `pivot_longer()` command to easily reshape the data.
+Time is already in a separate column, so we do not need to do anything with it.
+We can do that with `-Time`.
+We use the `names_to` argument to specify how we would like to call the column where the names for the old columns should go; the `values_to` argument does the same but for values.
 
 ```{r}
 timecourse_long <- pivot_longer(data = timecourse, -Time, names_to = "Species", values_to = "Concentration")
 ```
-To get a better understanding what the *pivot_longer()* function does, you can take a look at the two tables: timecourse and timecourse_long.
 
-Now we have everything we need for ggplot. We call the *ggplot()* function. As data, we need our prepared timecourse, *timecourse_long*. On the x-axis we want the time and on the y-axis we want the values (concentrations). To differentiate between our species, we also need color. 
+To get a better understanding what the `pivot_longer()` function does, you can take a look at the two tables: `timecourse` and `timecourse_long`.
+
+Now we have everything we need for ggplot.
+We call the `ggplot()` function.
+As data, we need our prepared timecourse, `timecourse_long`.
+On the x-axis we want the time and on the y-axis we want the values (concentrations).
+To differentiate between our species, we also need color. 
 
 ```{r}
-ggplot(data = timecourse_long, aes(x = Time, y = Concentration, color = Species))+
+ggplot(data = timecourse_long, aes(x = Time, y = Concentration, color = Species)) +
   geom_line()
 ```
 
@@ -381,8 +474,8 @@ ggplot(data = timecourse_long, aes(x = Time, y = Concentration, color = Species)
 
 
 
-And we just made our own, oscillating model! But why and how does our model oscillate?
-
+And we just made our own, oscillating model!
+But why and how does our model oscillate?
 
 In a helpful review from Novák and Tyson [^4] we find the following requirements for oscillators:
 
@@ -395,19 +488,21 @@ We can try and explain how our model oscillates by going through those point by 
 
 1. We have negative feedback - the more mice we create the more mice will be eaten by cats.
 2. The production of more cats following the production of lots of mice takes some time. This is why we do not get a steady state.  
-3. #Is this even the case? 
-4. They are in appropriate time scales. If our production of new cats would take years, whereas the population of mice would take days the populations would not sufficiently affect each other.
-
-
+3. # TODO Is this even the case? 
+4. They are in appropriate time scales.
+If our production of new cats would take years, whereas the population of mice would take days the populations wouldn't sufficiently affect each other.
 
 # 3D-Oscillations {.tabset .tabset-pills}
-We will now take a look at another model. This model is about oscillaitons in calcium signalling [(Kummer, 2000)](https://www.ebi.ac.uk/biomodels/BIOMD0000000329) [^5]. This model has three species: **G-alpha**, **activePLC** and **Calcium**. All three of these species can oscillate, so we can visualize this in a 3D-plot. 
+
+We will now take a look at another model.
+This model is about oscillations in calcium signalling [(Kummer, 2000)](https://www.ebi.ac.uk/biomodels/BIOMD0000000329) [^5].
+This model has three species: **G-alpha**, **activePLC** and **Calcium**.
+All three of these species can oscillate, so we can visualize this in a 3D-plot.
 
 But first, we need to load our model and create a timeseries. We will use a duration of 24, which is 2 Periods with 10000 intervals.
 
 ## Code
-```{r}
-
+```{r, eval=FALSE}
 # load this sbml-file:
 # https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000329_url.xml
 
@@ -415,18 +510,22 @@ But first, we need to load our model and create a timeseries. We will use a dura
 ```
 
 ## Hint
-To load an SBML file we use *loadSBML()*.
-The timecourse needs two arguments, *duration* and *intervals*
+
+To load an SBML file we use `loadSBML()`.
+The timecourse needs two arguments, `duration` and `intervals`.
 
 ## Solution
+
 First, we need to load the SBML file:
+
 ```{r}
 loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000329_url.xml")
 # loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000329?filename=BIOMD0000000329_url.xml")
 ```
-You can take a look at this model using the *getSpecies()* and *getReactions()* function.
 
-The timecourse has two arguments: *duration* needs to be set to 24 and *intervals* to 10000.
+You can take a look at this model using the `getSpecies()` and `getReactions()` function.
+
+The timecourse has two arguments: `duration` needs to be set to 24 and `intervals` to 10000.
 
 ```{r}
 timecourse <- runTimeCourse(duration = 24, intervals = 10000)$result
@@ -435,21 +534,28 @@ timecourse <- runTimeCourse(duration = 24, intervals = 10000)$result
 # {-}
 
 ### Vizualization
-We will use the **plotly** package to make a plot, because **ggplot2** does not support 3d graphics. With our plotly solution you can also interact with the plot in the browser.
+
+We will use the **plotly** package to make a plot, because **ggplot2** does not support 3d graphics
+With our plotly solution you can also interact with the plot in the browser.
 
 ```{r}
-det <- plot_ly(data = timecourse,
-                type = "scatter3d",
-                mode = "lines",
-                x = ~ `G-alpha`,
-                y = ~ activePLC,
-                z = ~ Calcium,
-                color = ~ Time)
-det
+plot_deterministic <-
+  plot_ly(data = timecourse,
+          type = "scatter3d",
+          mode = "lines",
+          x = ~ `G-alpha`,
+          y = ~ activePLC,
+          z = ~ Calcium,
+          color = ~ Time)
+
+plot_deterministic
 ```
 
 # Stochastic solutions {.tabset .tabset-pills}
-So far, we have only used deterministic modeling. But we can also run a timecourse stochastically! For this, we need the argument *method*.
+
+So far, we have only used deterministic modeling.
+But we can also run a timecourse stochastically!
+For this, we need the `method` argument.
 
 ## Code
 ```{r}
@@ -459,117 +565,150 @@ So far, we have only used deterministic modeling. But we can also run a timecour
 # Make plotly plot
 ```
 ## Hint
-The method needed is called *"directMethod". For the plot our code will look very similar to before.
+The method needed is called `"directMethod"`.
+For the plot our code will look very similar to before.
 
 ## Solution
-First, we run the time course. Here, we will use a random seed so whoever uses the code will get the same solution. But try it without the random seed serveral times and see, if you get different solutions!
+First, we run the time course.
+Here, we will use a random seed so whoever uses the code will get the same solution.
+But try it without the random seed serveral times and see, if you get different solutions!
 
 ```{r}
 tc_stochastic <- runTimeCourse(duration = 24, intervals = 1000, method = list(method = "directMethod", 
                                                                               use_random_seed = TRUE, 
                                                                               random_seed = 1))$result
 ```
-Now, we will create another plotly-plot:
-```{r}
-stoc <- plot_ly(data = tc_stochastic,
-        type = "scatter3d",
-        mode = "lines",
-        x = ~ `G-alpha`,
-        y = ~ activePLC,
-        z = ~ Calcium,
-        color = ~ Time
-        )
 
-stoc
+Now, we will create another plotly-plot:
+
+```{r}
+plot_stochastic <-
+  plot_ly(data = tc_stochastic,
+          type = "scatter3d",
+          mode = "lines",
+          x = ~ `G-alpha`,
+          y = ~ activePLC,
+          z = ~ Calcium,
+          color = ~ Time)
+
+plot_stochastic
 ```
 
 # {-}
 
-As we can see the two cycles for the deterministic solution do not really look all that different from each other. For the stochastic solution on the other hand, we can really see that a different random seed, or just letting the cycle run twice really changes how our solution looks.
-
+As we can see the two cycles for the deterministic solution do not really look all that different from each other.
+In contrast, the stochastic solution is really affected by random fluctuations.
+Using a different random seed, or just letting the cycle run twice really changes how our solution looks.
 
 
 # Limit circles
-We can now take a look at our model in a different way. What do you think will happen, if we plot the two species of our model - one on the x-axis and one on the y-axis:
+
+We can now take a look at our model in a different way.
+What do you think will happen, if we plot the two species of our model - one on the x-axis and one on the y-axis:
 
 ````{r, echo = FALSE}
 ggplot()+
   geom_line(data = tc_stochastic, aes(x = activePLC, y = Calcium, color = Time))
-
 ```
 
-What we see here we can call a limit cycle. Stable limit cycle oscillations will always return to the limit cycle, no matter the starting conditions. Obviously, this is very useful for keeping a system in balance. 
+What we see here we can call a limit cycle.
+Stable limit cycle oscillations will always return to the limit cycle, no matter the starting conditions.
+Obviously, this is very useful for keeping a system in balance. 
 
 We will try a parameter scan over different starting conditions and plot these:
 
 # {.tabset .tab-pills}
 
 ## Code
-We want 10 different conditions for starting values of our species. We want them normally distributed around the current value for each species with a standard deviation of 15 % of the current value
+We want 10 different conditions for starting values of our species.
+We want them normally distributed around the current value for each species with a standard deviation of 15 % of the current value
 
-```{r}
+```{r, eval=FALSE}
 scan_values <- tibble(Galpha = c(), activePLC = c(), Calcium = c())
 ```
 
 Afterwards, we want to run a timecourse for each of the ten combinations in *scan_values*. 
 
-```{r}
+```{r, eval=FALSE}
 # run 10 time courses
 ```
 
 And lastly, we want to plot everything.
 
-```{r}
+```{r, eval=FALSE}
 # plot 
 ```
 
 ## Hint
-You can generate random numbers that are normally distributed using *rnorm*.
+You can generate random numbers that are normally distributed using `rnorm`.
 
-You can use a for-loop to run your timecourses. Make sure you set your species before each timecourse.
+You can use a for-loop to run your timecourses
+Make sure you set your species before each timecourse.
 
 The plotting part should look similar to above
 
 ## Solution
-First, we want to make 10 starting conditions. These should be normally distributed with a mean of the current initial concentration and a standard deviation of 15 % of the current initial concentration.
 
-We will first generate a vector of our initial concentrations, called *species* and a vector of our standard deviation *sd* by multiplying *species* with 0.15 .
+First, we want to make 10 starting conditions.
+These should be normally distributed with a mean of the current initial concentration and a standard deviation of 15 % of the current initial concentration.
+
+We will first generate a vector of our initial concentrations, called `species` and a vector of our standard deviation `sd` by multiplying `species` with 0.15.
+
 ```{r}
 species <- getSpecies()$initial_concentration
 sd <- species * 0.15
 ```
-We can now create our *scan_value* tibble by using the *rnorm* function. *rnorm()* creates n random numbers, normally distributed around a *mean* and with a standard deviation *sd*. We will now fill our tibble with our three species: 
+
+We can now create our `scan_value` tibble by using the `rnorm` function.
+`rnorm()` creates `n` random numbers, normally distributed around a `mean` and with a standard deviation `sd`. We will now fill our tibble with our three species:
+
 ```{r}
-scan_values <- tibble(Galpha = rnorm(10, mean = species[1], sd = sd[1]),
+scan_values_df <- tibble(Galpha = rnorm(10, mean = species[1], sd = sd[1]),
                   activePLC = rnorm(10, mean = species[2], sd = sd[2]),
                   Calcium = rnorm(10, mean = species[3], sd = sd[3]))
 ```
-We will first run a time course to append to and afterwards run 10 time courses with different inital concentrations for our species in a for-loop. 
 
-The for loop runs 10 times, and each time the species will be changed and another timecourse run and appended to the ones before. To keep track of which round we are in, we append a column *nr*.
+We will run 10 time courses with different initial concentrations for our species in a for-loop.
+
+The for loop runs for each row of the `scan_values_df` dataframe, specifying an initial condition.
+Each time, the new initial condition is applied, the timecourse is run and appended to a list collecting all timecourses.
+The results are merged into a single dataframe `tc_df` with the column "nr" specifying the iteration.
+
 ```{r}
+tc_list <- list()
 
-tc <- runTimeCourse(duration = 24, intervals = 100)$result %>% add_column(nr = rep(0, 101))
-
-for (scan in 1:10){
-  setSpecies(key = getSpecies()$key, initial_concentration = unlist(scan_values[scan,]))
-  tc_new <- runTimeCourse(duration = 24, intervals = 100)$result %>% add_column(nr = rep(scan, 101))
-  tc <- add_row(tc, tc_new)
+for (scan in 1:nrow(scan_values_df)) {
+  setSpecies(key = species(), initial_concentration = unlist(scan_values_df[scan, ]))
+  
+  tc_new <- runTimeCourse(duration = 24, intervals = 100)$result
+  tc_list[scan] <- list(tc_new)
 }
+
+tc_df <-
+  tc_list %>%
+  bind_rows(.id = "nr") %>%
+  mutate(nr = as.numeric(nr))
 ```
-The plotting works the same as before. But instead of time, this time we want to color in our run (*nr*).
+
+<!-- TODO
+The numbering makes this quite messy.
+nr is either numeric, causing the ggplot to draw only one line (hard to see, can be fixed with group = nr), or nr is integer, which causes plotly to run out of coloring palette.
+I suggest using only 8 iterations and keeping nr as integer
+-->
+The plotting works the similarly to before, but instead of `time`, we want to color by our run counter (`nr`).
+
 ```{r}
-
-ggplot()+
-  geom_line(data = tc, aes(x = activePLC, y = Calcium, color = nr))
-
+tc_df %>%
+  ggplot(aes(x = activePLC, y = Calcium, color = nr)) +
+  geom_line()
 ```
 
 # {-}
+
 We can also take a look at how that looks in 3d:
 
 ```{r}
-multiple3d <- plot_ly(data = tc,
+multiple3d <- plot_ly(data = tc_df,
         type = "scatter3d",
         mode = "lines",
         x = ~ `G-alpha`,
@@ -587,5 +726,3 @@ multiple3d
 [^3]: HIER BRAUCHE ICH NOCH EINE QUELLE!
 [^4]: Novák, Béla, and John J. Tyson. "Design principles of biochemical oscillators." Nature reviews Molecular cell biology 9.12 (2008): 981-991.
 [^5]: Kummer, Ursula, et al. "Switching from simple to complex oscillations in calcium signaling." Biophysical journal 79.3 (2000): 1188-1195.
-
-

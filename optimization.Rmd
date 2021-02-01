@@ -3,6 +3,7 @@ title: "Optimization"
 author: "Johanna Daas"
 output: html_document
 ---
+
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -16,12 +17,15 @@ knitr::opts_chunk$set(
 )
 set.seed(1)
 ```
+
 This document follows closely the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
 
 If we want to optimize something, we either want to *minimize* or *maximize* a specific task value.
 
 # Setup
-First, we have to load **CoRC** and **tidyverse**. Make sure you have these packages downloaded.
+
+First, we have to load **CoRC** and **tidyverse**.
+Make sure you have these packages downloaded.
 
 ```{r, message = FALSE}
 library(CoRC)
@@ -29,34 +33,42 @@ library(tidyverse)
 ```
 
 # Loading the model
+
 We will work with model [Nr. 23 in BioModels](https://www.ebi.ac.uk/biomodels/BIOMD0000000023)[^2], which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001). 
+The model is stored in this repository but can also be loaded directly from the biomodels database (see commented out line).
 
 ```{r}
 loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000023_url.xml")
 # loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml")
 ```
+
 We will first take a look at the reactions:
+
 ```{r}
 getReactions()
 ```
+
 Of interest to us are reactions *v11* (accumulation of sucrose in vacuoles) and *v9* (hydrolysis of sucrose), which decreases our overall productivity.
 
 We can see the behavior of these two species over time in this plot:
+
 ```{r, echo = FALSE}
 tc1 <- runTC(duration = 1000, dt = 1)$result %>% 
   pivot_longer(-Time, names_to = "names", values_to = "values")
-ggplot(data = tc1)+
+ggplot(data = tc1) +
   geom_line(aes(x = Time, y = values, color = names))
-
 ```
 
 # The objective function
 
-We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis.  $J_{v11}/J_{v9} $. For our optimization algorithms it is necessary to define our optimization goal as a minimum: we want to minimize $J_{v9}/J_{v11}$
+We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis.
+$J_{v11}/J_{v9} $.
+For our optimization algorithms it is necessary to define our optimization goal as a minimum: we want to minimize $J_{v9}/J_{v11}$
 
 What we just defined is called an *objective function*.
 
 In **CoRC** we can define the objective function like this:
+
 ```{r}
 objf <- paste0(reaction("(v9)", reference = "Flux"), "/", reaction("(v11)", reference = "Flux"))
 getValue(objf)
@@ -64,10 +76,14 @@ getValue(objf)
 
 # The parameters
 
-Now we have to think about, what we are able to change to reach the minimum possible value for our objective function. We can assume for this teaching example that we are able to manipulate the steady state levels of our enzymes in reactions *v1*, *v2*, *v3*, *v4* and *v5*. 
+Now we have to think about, what we are able to change to reach the minimum possible value for our objective function.
+We can assume for this teaching example that we are able to manipulate the steady state levels of our enzymes in reactions *v1*, *v2*, *v3*, *v4* and *v5*.
 
-We have to tell **CoRC** about our optimization parameters like this:
-We could also specify our parameters more closely, e.g. give them a specific starting value or bounds on how far the estimation is allowed to search. We will say that we can downregulate an enzyme by 50% and overexpress it by 400%. The start values are supposed to be the current values in our model.
+We have to define our optimization parameters in **CoRC**.
+It is possible to specify  several aspects of our parameters, e.g. give them a specific starting value or bounds on how far the estimation is allowed to search.
+We will say that we can downregulate an enzyme by 50% or overexpress it by 400%.
+The start values are going to be the current values in our model.
+
 ```{r}
 make_opt_param <- function(name) {
   value_ref <- parameter_strict(name, reference = "Value")
@@ -82,15 +98,23 @@ parameters <- lapply(c("(v1).Vmax1", "(v2).Vmax2", "(v3).Vmax3", "(v4).Vmax4", "
 ```
 
 # Optimization method
-Now we have to choose which optimization method we will use for optimization. For our first try we will use *Truncated Newton*. There are a lot of different methods available in **CoRC** which you can find in the documentation of the runOptimization() function. 
+
+Now we have to choose which optimization method we will use for optimization.
+For our first try we will use *Truncated Newton*.
+There are a lot of different methods available in **CoRC** which you can find in the documentation of the `runOptimization()` function. 
+
 ```{r}
 method <- 'TruncatedNewton'
 ```
 
 # Optimization
-Now we have all elements we need for our optimization routine. We still need to specify a few arguments in our function:
-* subtask: Our subtask is optimization. We could also run a Steady State Analysis or a Scan with this function
-* randomize_start_values: We just took the time specifying where our start values are so we don't want to randomize them all again. If we think we always find a local minimum instead of a global one, it might be helpful to randomize the start values.
+
+Now we have all elements we need for our optimization routine.
+We still need to specify a few arguments in our function:
+
+* subtask: Our subtask is optimization. We could also run a Steady State Analysis or a Scan with this function.
+* randomize_start_values: We just took the time specifying where our start values are so we don't want to randomize them all again.
+If we think we always find a local minimum instead of a global one, it might be helpful to randomize the start values.
 * update_model: We will save our current parameter values, so we can update the model in this function and not lose them.
 
 ```{r}
@@ -105,7 +129,9 @@ result <- runOptimization(expression = objf,
 result$main$objective_value
 result$parameters
 ```
+
 Our new model with the updated parameter values looks like this:
+
 ```{r, echo = FALSE}
 tc <- runTC(duration = 1000, dt = 1)$result %>% 
   pivot_longer(-Time, names_to = "names", values_to = "values")
@@ -113,7 +139,8 @@ ggplot()+
   geom_line(data = tc1, linetype = "dashed", aes(x = Time, y = values, color = names))+
   geom_line(data = tc, aes(x = Time, y = values, color = names))
 ```
-The dashed lines where from the timecourse before the optimization, so we can see that our optimization routine worked!
+
+The dashed lines were from the timecourse before the optimization, so we can see that our optimization routine worked very well!
 
 ## References
 [^1]:  Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. https://doi.org/10.1007/978-1-59745-525-1_2

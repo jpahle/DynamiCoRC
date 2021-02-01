@@ -3,6 +3,7 @@ title: "Parallel processing with CoRC"
 author: "Jonas Förster, Johanna Daas"
 output: html_document
 ---
+
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -22,12 +23,18 @@ library(tidyverse)
 library(parallel)
 library(CoRC)
 ```
+
 We will define a function to help us run tasks in parallel on all cores:
+
 ```{r}
 mapInParallel <- function(data, fun, ..., .export = character(), .prep = {}) {
+  # make a cluster of r sessions on our local machine
   cl <- makeCluster(detectCores())
+  # export any variables as specified in the .export argument
   clusterExport(cl = cl, .export)
+  # prepare the environment by loading packages etc.
   clusterCall(cl = cl, fun = eval, .prep, env = .GlobalEnv)
+  # evaluate the given code
   result <- parLapplyLB(cl = cl, X = data, fun = as_mapper(fun), ..., chunk.size = 50)
   stopCluster(cl)
   result
@@ -39,10 +46,12 @@ mapInParallel <- function(data, fun, ..., .export = character(), .prep = {}) {
 This is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91) [^1].
 
 First, we always have to load our model:
+
 ```{r}
 loadModel("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/stochastic_test.cps")
 # loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
 ```
+
 Now, we will set our timecourse settings and save our model to a string so we can load it again later for our parallel processing. 
 
 ```{r}
@@ -52,10 +61,11 @@ setTimeCourseSettings(method = list(method = "directMethod",
 model_string <- saveModelToString()
 ```
 
+Next, we will set everything up to run 1000 Timecouses in parallel.
+We need to export our model to the workers, as well as load CoRC and our model for each worker.
+Afterwards, we set 1000 random seeds so each time course will get a different random seed.
+Lastly, we call the timecourse function.
 
-
-Next, we will set everything up to run 1000 Timecouses in parallel. We need to export our model to the workers, as well as load CoRC and our model for each worker.
-Afterwards, we seet 1000 random seeds so each time course will get a different random seed. Lastly, we call the timecourse function.
 ```{r}
 timeseries <-
   #Defines parallel evaluation
@@ -73,8 +83,9 @@ timeseries <-
     function(seed) runTimeCourse(method = list(random_seed = seed ))$result
   )
 ```
+
 Now, we will reshape our data to plot it later on:
-*timeseries* is a list of 1000 tibbles with each tibble a time course. 
+`timeseries` is a list of 1000 tibbles with each tibble being time course. 
 
 ```{r}
 plotdata <-
@@ -85,15 +96,15 @@ plotdata <-
   summarise(across(everything(), list(mean = mean, sd = sd)), .groups = "drop") %>%
   # gather all values so the column `name` identifies "a_mean", "b_sd" etc.
   pivot_longer(-Time) %>%
-  # split up information on species (a,b,c) and type of value (mean, sd)
+  # split up information on species (a, b, c) and type of value (mean, sd)
   separate(name, c("species", "type"), "_") %>%
   pivot_wider(names_from = type, values_from = value)
 
-head(plotdata)
-  
+plotdata
 ```
 
 Now, we will plot the data:
+
 ```{r, message = FALSE}
 plot <-
   ggplot(data = plotdata, aes(x = Time, y = mean, group = species, tt_sd = sd)) +
@@ -110,12 +121,15 @@ plotly::ggplotly(plot, tooltip = c("group", "x", "y", "tt_sd"))
 ```
 
 To free some space, we can unload the model:
+
 ```{r}
 unloadModel()
 ```
 
 # 2D Scan over Random Concentrations of Two Species 
-Very similarly we will now scan over random concentrations of two species. This implements an example from the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2) [^2] on COPASI use cases. 
+
+Very similarly we will now scan over random concentrations of two species.
+This implements an example from the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2) [^2] on COPASI use cases. 
 
 We will load the model, set the steady state settings, and save our model as a string to load it in parallel later.
 
@@ -128,9 +142,10 @@ setSteadyStateSettings(calculate_jacobian = FALSE, perform_stability_analysis = 
 model_string <- saveModelToString()
 ```
 
-This time, we will run 10.000 stady-state calculations with random concentrations of two species (cysteine and adomed). 
+This time, we will run 10000 stady-state calculations with random concentrations of two species (cysteine and adomed). 
 
-We will export the model to the workers, load CoRC and the model. Then we will assign random concentrations and run a steady state calculation:
+We will export the model to the workers, load CoRC and the model.
+Then we will assign random concentrations and run a steady state calculation:
 
 ```{r}
 scan <-
@@ -186,7 +201,9 @@ plot <-
 
 plotly::ggplotly(plot, tooltip = c("tt_cys", "x", "y"))
 ```
+
 At the end we can again unload the model to free up memory.
+
 ```{r}
 unloadModel()
 ```

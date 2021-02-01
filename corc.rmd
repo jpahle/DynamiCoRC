@@ -8,4 +8,4 @@ CoRC is a ...
 
 
 
-Klick here to find out more about [**CoRC**](https://jpahle.github.io/CoRC/). 
+Click here to find out more about [**CoRC**](https://jpahle.github.io/CoRC/). 
