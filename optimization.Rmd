@@ -32,7 +32,8 @@ library(tidyverse)
 We will work with model [Nr. 23 in BioModels](https://www.ebi.ac.uk/biomodels/BIOMD0000000023)[^2], which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001). 
 
 ```{r}
-loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml")
+loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000023_url.xml")
+# loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml")
 ```
 We will first take a look at the reactions:
 ```{r}

@@ -92,7 +92,8 @@ And done! We set up our worksheet :)
 This implementation is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91)[^1]!
 You can find the model here:
 ```{r}
-loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
+loadModel("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/stochastic_test.cps")
+# loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
 ```
 
 ## Code
@@ -408,11 +409,9 @@ But first, we need to load our model and create a timeseries. We will use a dura
 ```{r}
 
 # load this sbml-file:
-#"https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000329?filename=BIOMD0000000329_url.xml"
+# https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000329_url.xml
 
-#run timecourse
-
-
+# run timecourse
 ```
 
 ## Hint
@@ -422,7 +421,8 @@ The timecourse needs two arguments, *duration* and *intervals*
 ## Solution
 First, we need to load the SBML file:
 ```{r}
-loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000329?filename=BIOMD0000000329_url.xml")
+loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000329_url.xml")
+# loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000329?filename=BIOMD0000000329_url.xml")
 ```
 You can take a look at this model using the *getSpecies()* and *getReactions()* function.
 
