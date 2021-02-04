@@ -663,9 +663,15 @@ We can now create our `scan_value` tibble by using the `rnorm` function.
 `rnorm()` creates `n` random numbers, normally distributed around a `mean` and with a standard deviation `sd`. We will now fill our tibble with our three species:
 
 ```{r}
-scan_values_df <- tibble(Galpha = rnorm(10, mean = species[1], sd = sd[1]),
-                  activePLC = rnorm(10, mean = species[2], sd = sd[2]),
-                  Calcium = rnorm(10, mean = species[3], sd = sd[3]))
+scan_df <- tibble(
+  Galpha_0 = rnorm(8, mean = species[1], sd = sd[1]),
+  activePLC_0 = rnorm(8, mean = species[2], sd = sd[2]),
+  Calcium_0 = rnorm(8, mean = species[3], sd = sd[3])
+)
+
+scan_df <- rownames_to_column(scan_df, var = "nr")
+
+scan_df
 ```
 
 We will run 10 time courses with different initial concentrations for our species in a for-loop.
@@ -675,19 +681,20 @@ Each time, the new initial condition is applied, the timecourse is run and appen
 The results are merged into a single dataframe `tc_df` with the column "nr" specifying the iteration.
 
 ```{r}
-tc_list <- list()
-
-for (scan in 1:nrow(scan_values_df)) {
-  setSpecies(key = species(), initial_concentration = unlist(scan_values_df[scan, ]))
+run_tc <- function(Galpha_0, activePLC_0, Calcium_0) {
+  setSpecies(key = "G-alpha", initial_concentration = Galpha_0)
+  setSpecies(key = "activePLC", initial_concentration = activePLC_0)
+  setSpecies(key = "Calcium", initial_concentration = Calcium_0)
   
-  tc_new <- runTimeCourse(duration = 24, intervals = 100)$result
-  tc_list[scan] <- list(tc_new)
+  return(runTimeCourse(duration = 24, intervals = 100)$result)
 }
 
-tc_df <-
-  tc_list %>%
-  bind_rows(.id = "nr") %>%
-  mutate(nr = as.numeric(nr))
+scan_df <-
+  scan_df %>%
+  rowwise(everything()) %>%
+  summarise(tc = list(run_tc(Galpha_0, activePLC_0, Calcium_0)), .groups = "drop")
+
+scan_df
 ```
 
 <!-- TODO
@@ -698,7 +705,8 @@ I suggest using only 8 iterations and keeping nr as integer
 The plotting works the similarly to before, but instead of `time`, we want to color by our run counter (`nr`).
 
 ```{r}
-tc_df %>%
+scan_df %>%
+  unnest(tc) %>%
   ggplot(aes(x = activePLC, y = Calcium, color = nr)) +
   geom_line()
 ```
@@ -708,7 +716,7 @@ tc_df %>%
 We can also take a look at how that looks in 3d:
 
 ```{r}
-multiple3d <- plot_ly(data = tc_df,
+multiple3d <- plot_ly(data = unnest(scan_df, tc),
         type = "scatter3d",
         mode = "lines",
         x = ~ `G-alpha`,
