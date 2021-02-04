@@ -356,11 +356,12 @@ $(document).ready(function () {
 #&gt; Number of compartments: 1
 #&gt; Number of species: 8
 #&gt; Number of reactions: 10</code></pre>
-<p><img src="parameter_files/figure-html/unnamed-chunk-3-1.png" width="100%" /> As you can see, the model does not describe the data perfectly. We will try and get a better result by changing the parameters of our model.</p>
+<p><img src="parameter_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
+<p>As you can see, the model does not describe the data perfectly. We will try and get a better result by changing the parameters of our model.</p>
 </div>
 <div id="parameter-estimation" class="section level1">
 <h1>Parameter estimation</h1>
-<p>We want to find the parameters of our model that describe the data best. We call this <em>Parameter Estimation</em>. We have 22 parameters in our model, so finding the right combination of parameters by chance and just trying out is nearly impossible. Even only using a limited subset of these parameters (as we will do) will not work that way. We will use <em>algorythms</em> for that.</p>
+<p>We want to find the parameters of our model that describe the data best. We call this <em>Parameter Estimation</em>. We have 22 parameters in our model, so finding the right combination of parameters by chance and just trying out is nearly impossible. Even only using a limited subset of these parameters (as we will do) will not work that way. We will use <em>algorithms</em> for that.</p>
 <p>Parameter estimation is an important topic when handling a model. In <strong>CoRC</strong> you have to</p>
 <ol style="list-style-type: decimal">
 <li>Built or load a model,</li>
@@ -368,7 +369,7 @@ $(document).ready(function () {
 <li>Define parameters that will be fitted</li>
 <li>Run Parameter Estimation.</li>
 </ol>
-<p>We will go through these steps individually and explain what needs to be done as well as show visually how parameter estimation betters your fit.</p>
+<p>We will go through these steps individually and explain what needs to be done as well as show visually how parameter estimation improves your fit.</p>
 </div>
 <div id="setup" class="section level1">
 <h1>Setup:</h1>
@@ -384,30 +385,26 @@ library(ggplot2)</code></pre>
 #&gt; Model name: &quot;Kholodenko2000 - Ultrasensitivity and negative feedback bring oscillations in MAPK cascade&quot;
 #&gt; Number of compartments: 1
 #&gt; Number of species: 8
-#&gt; Number of reactions: 10</code></pre>
+#&gt; Number of reactions: 10
+# loadSBML(&quot;https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000010_url.xml&quot;)</code></pre>
 <p>We can inspect the species of the model like this:</p>
 <pre class="r"><code>getSpecies()
 #&gt; # A tibble: 8 x 13
-#&gt;   key   name  compartment type  unit 
-#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;
-#&gt; 1 Mos{~ Mos   uVol        reac~ nmol~
-#&gt; 2 Mos-~ Mos-P uVol        reac~ nmol~
-#&gt; 3 Mek1~ Mek1  uVol        reac~ nmol~
-#&gt; 4 Mek1~ Mek1~ uVol        reac~ nmol~
-#&gt; 5 Mek1~ Mek1~ uVol        reac~ nmol~
-#&gt; 6 Erk2~ Erk2  uVol        reac~ nmol~
-#&gt; 7 Erk2~ Erk2~ uVol        reac~ nmol~
-#&gt; 8 Erk2~ Erk2~ uVol        reac~ nmol~
-#&gt; # ... with 8 more variables:
-#&gt; #   initial_concentration &lt;dbl&gt;,
-#&gt; #   initial_number &lt;dbl&gt;,
-#&gt; #   concentration &lt;dbl&gt;, number &lt;dbl&gt;,
-#&gt; #   rate &lt;dbl&gt;, number_rate &lt;dbl&gt;,
-#&gt; #   initial_expression &lt;chr&gt;,
-#&gt; #   expression &lt;chr&gt;</code></pre>
-<p>This works in a similar way for reactions (<em>getReactions()</em>) and parameters (<em>getParameters()</em>)</p>
+#&gt;   key   name  compartment type  unit  initial_concent~ initial_number
+#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;            &lt;dbl&gt;          &lt;dbl&gt;
+#&gt; 1 Mos{~ Mos   uVol        reac~ nmol~               90        5.42e16
+#&gt; 2 Mos-~ Mos-P uVol        reac~ nmol~               10        6.02e15
+#&gt; 3 Mek1~ Mek1  uVol        reac~ nmol~              280        1.69e17
+#&gt; 4 Mek1~ Mek1~ uVol        reac~ nmol~               10        6.02e15
+#&gt; 5 Mek1~ Mek1~ uVol        reac~ nmol~               10        6.02e15
+#&gt; 6 Erk2~ Erk2  uVol        reac~ nmol~              280        1.69e17
+#&gt; 7 Erk2~ Erk2~ uVol        reac~ nmol~               10        6.02e15
+#&gt; 8 Erk2~ Erk2~ uVol        reac~ nmol~               10        6.02e15
+#&gt; # ... with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
+#&gt; #   number_rate &lt;dbl&gt;, initial_expression &lt;chr&gt;, expression &lt;chr&gt;</code></pre>
+<p>This works in a similar way for reactions (<code>getReactions()</code>) and parameters (<code>getParameters()</code>)</p>
 <p>If you have <strong>COPASI</strong> installed, you can also have a look at the model there:</p>
-<pre class="r"><code># openCopasi()</code></pre>
+<pre class="r"><code>openCopasi()</code></pre>
 </div>
 <div id="define-an-experiment" class="section level2">
 <h2>2. Define an Experiment</h2>
@@ -429,9 +426,9 @@ data
 #&gt; 10 1000  3.80  17.00</code></pre>
 <p>Then you have to define the experiment for COPASI. You need the data, as well as the type and mappings for the species. You can choose a weight method for your data (which prevents parameters getting fitted more closely just because they have higher values).</p>
 <p>Your data colums in your data file can be of type “time”, “dependent” and “independent”, and if you want to exclude a column you can choose “ignore”.</p>
-<p>The mapping argument in the function maps the data columns with the species in your model. In our case, the provided data is time course data, and our values are “transient concentrations”. They are denoted like this: {[Species]}. You can find these notation by using the function <em>getSpeciesReferences()</em>.</p>
-<p>Time needs to be mapped with NA.</p>
-<p>Allowed weight methods are <em>‘mean’, ‘mean_square’, ‘sd’</em>, and <em>‘value_scaling’</em>.</p>
+<p>The mapping argument in the function maps the data columns with the species in your model. In our case, the provided data is time course data, and our values are “transient concentrations”. They are denoted like this: {[Species]}. You can find these notation by using the function <code>getSpeciesReferences()</code>.</p>
+<p>Time needs to be mapped with <code>NA</code>.</p>
+<p>Allowed weight methods are <code>"mean"</code>, <code>"mean_square"</code>, <code>"sd"</code>, and <code>"value_scaling"</code>.</p>
 <pre class="r"><code>fit_experiments &lt;- defineExperiments(
   data = data,
   type = c(&quot;time&quot;, &quot;dependent&quot;, &quot;dependent&quot;),
@@ -445,20 +442,20 @@ data
 <p>First, let us take a look at all the parameters in the model:</p>
 <pre class="r"><code>getParameters()
 #&gt; # A tibble: 22 x 5
-#&gt;    key        name  reaction    value mapping
-#&gt;    &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;  
-#&gt;  1 (MAPKKK a~ V1    MAPKKK ac~  2.5   &lt;NA&gt;   
-#&gt;  2 (MAPKKK a~ Ki    MAPKKK ac~  9     &lt;NA&gt;   
-#&gt;  3 (MAPKKK a~ n     MAPKKK ac~  1     &lt;NA&gt;   
-#&gt;  4 (MAPKKK a~ K1    MAPKKK ac~ 10     &lt;NA&gt;   
-#&gt;  5 (MAPKKK i~ V2    MAPKKK in~  0.25  &lt;NA&gt;   
-#&gt;  6 (MAPKKK i~ KK2   MAPKKK in~  8     &lt;NA&gt;   
-#&gt;  7 (phosphor~ k3    phosphory~  0.025 &lt;NA&gt;   
-#&gt;  8 (phosphor~ KK3   phosphory~ 15     &lt;NA&gt;   
-#&gt;  9 (phosphor~ k4    phosphory~  0.025 &lt;NA&gt;   
-#&gt; 10 (phosphor~ KK4   phosphory~ 15     &lt;NA&gt;   
+#&gt;    key                             name  reaction                  value mapping
+#&gt;    &lt;chr&gt;                           &lt;chr&gt; &lt;chr&gt;                     &lt;dbl&gt; &lt;chr&gt;  
+#&gt;  1 (MAPKKK activation).V1          V1    MAPKKK activation         2.5   &lt;NA&gt;   
+#&gt;  2 (MAPKKK activation).Ki          Ki    MAPKKK activation         9     &lt;NA&gt;   
+#&gt;  3 (MAPKKK activation).n           n     MAPKKK activation         1     &lt;NA&gt;   
+#&gt;  4 (MAPKKK activation).K1          K1    MAPKKK activation        10     &lt;NA&gt;   
+#&gt;  5 (MAPKKK inactivation).V2        V2    MAPKKK inactivation       0.25  &lt;NA&gt;   
+#&gt;  6 (MAPKKK inactivation).KK2       KK2   MAPKKK inactivation       8     &lt;NA&gt;   
+#&gt;  7 (phosphorylation of MAPKK).k3   k3    phosphorylation of MAPKK  0.025 &lt;NA&gt;   
+#&gt;  8 (phosphorylation of MAPKK).KK3  KK3   phosphorylation of MAPKK 15     &lt;NA&gt;   
+#&gt;  9 (phosphorylation of MAPKK-P).k4 k4    phosphorylation of MAPK~  0.025 &lt;NA&gt;   
+#&gt; 10 (phosphorylation of MAPKK-P).K~ KK4   phosphorylation of MAPK~ 15     &lt;NA&gt;   
 #&gt; # ... with 12 more rows</code></pre>
-<p>Now, we only want to fit the reaction rates (parameters with V). To make our fit parameters we need to make a list of lists with the attributes of the different parameter-estimation settings. To <em>define</em> a parameter for Parameter Estimation, we use the defineParameterEstimationParameter()-Function.</p>
+<p>Now, we only want to fit the reaction rates (parameters with V). To make our fit parameters we need to make a list of lists with the attributes of the different parameter-estimation settings. To <em>define</em> a parameter for Parameter Estimation, we use the <code>defineParameterEstimationParameter()</code> function.</p>
 <pre class="r"><code>fit_parameters &lt;- list(
   defineParameterEstimationParameter(
     ref = &quot;{(MAPKKK activation).V1}&quot;,
@@ -500,9 +497,9 @@ data
 </div>
 <div id="run-parameter-estimation" class="section level2">
 <h2>4. Run parameter estimation</h2>
-<p>To show how well our Parameter Estimation works, we want to print the model before and after parameter estimation. To do this, we have to <em>run</em> two Time Course Evaluations, one with the parameters now, and one with the parameters after the Parameter Estimation.</p>
+<p>To show how well our Parameter Estimation works, we want to print the model before and after parameter estimation. To do this, we have to <em>run</em> two Time Course evaluations, one with the parameters now, and one with the parameters after the Parameter Estimation.</p>
 <pre class="r"><code>before &lt;- runTimeCourse(duration = 1000, dt = 1)$result</code></pre>
-<p>After doing this, we will now actually run the Parameter Estimation. We need the parameters, experiments with our data that will be fitted, and specify the method. We want to use the Levenberg Marquardt method but other methods are available as well. You can find them using the function <em>getValidReactionFunctions()</em> with your function as an argument.</p>
+<p>After doing this, we will now actually run the Parameter Estimation. We need the parameters, experiments with our data that will be fitted, and specify the method. We want to use the Levenberg Marquardt method but other methods are available as well. You can find them using the function <code>getValidReactionFunctions()</code> with your function as an argument.</p>
 <p>Also, we specify that we want to update our model. This means, that all estimated parameters will be updated with the parameters of the best estimation. To compare the fit to the previous parameters we need to make sure we keep the previous fit. We already did that with our time course in the last chunk.</p>
 <pre class="r"><code>result &lt;-
   runParameterEstimation(
@@ -514,21 +511,21 @@ data
     ),
     update_model = TRUE
   )</code></pre>
-<p>You can have a nicely readable version of the result by using the str() function. For space-reasons we will only take a look at the fitted values, but feel free to take a look at anything you find interesting.</p>
+<p>You can have a nicely readable version of the result by using the <code>str()</code> function. For space-reasons we will only take a look at the fitted values, but feel free to take a look at anything you find interesting.</p>
 <pre class="r"><code>str(result$fitted_values)
 #&gt; tibble [2 x 5] (S3: tbl_df/tbl/data.frame)
 #&gt;  $ fitted_value            : chr [1:2] &quot;[Mos-P]&quot; &quot;[Erk2-P]&quot;
-#&gt;  $ objective_value         : num [1:2] 28.3 14
-#&gt;  $ root_mean_square        : num [1:2] 1.68 1.18
-#&gt;  $ error_mean              : num [1:2] -0.363 0.107
-#&gt;  $ error_mean_std_deviation: num [1:2] 1.64 1.18</code></pre>
+#&gt;  $ objective_value         : num [1:2] 28.5 14
+#&gt;  $ root_mean_square        : num [1:2] 1.69 1.18
+#&gt;  $ error_mean              : num [1:2] -0.365 0.109
+#&gt;  $ error_mean_std_deviation: num [1:2] 1.65 1.18</code></pre>
 </div>
 <div id="visualize-results" class="section level2">
 <h2>5. Visualize results</h2>
 <p>Now we have estimated and updated the parameters of our current model. To compare our old model parameters to our new, we run another time course.</p>
 <pre class="r"><code>after &lt;- runTimeCourse(duration = 1000, dt = 1)$result</code></pre>
 <p>We will use ggplot for visualizing our results. If you have never worked with ggplot, this way to define a plot will look unusual to you.</p>
-<p>We first want to plot our expermental data, as well as two time courses (before and after) for Erk2-P and Mos-P.</p>
+<p>We first want to plot our experimental data, as well as two time courses (before and after) for <em>Erk2-P</em> and <em>Mos-P</em>.</p>
 <pre class="r"><code>Erk2P &lt;- 
   ggplot(mapping = aes(x = Time, y = `Erk2-P`)) +
   geom_point(data = data, aes(y = Erk2.P, color = &quot;experimental&quot;)) +
@@ -542,9 +539,11 @@ MosP &lt;-
   geom_line (data = after, aes(color = &quot;after&quot;))</code></pre>
 <p>At the end, our result for Erk2-P</p>
 <pre class="r"><code>Erk2P</code></pre>
-<p><img src="parameter_files/figure-html/unnamed-chunk-17-1.png" width="100%" /> as well as our result for Mos-P</p>
+<p><img src="parameter_files/figure-html/unnamed-chunk-17-1.png" width="100%" /></p>
+<p>as well as our result for Mos-P</p>
 <pre class="r"><code>MosP</code></pre>
-<p><img src="parameter_files/figure-html/unnamed-chunk-18-1.png" width="100%" /> show, how well the Parameter Estimation was able to fit our model to the data.</p>
+<p><img src="parameter_files/figure-html/unnamed-chunk-18-1.png" width="100%" /></p>
+<p>show, how well the Parameter Estimation was able to fit our model to the data.</p>
 <p>At the end, we can <em>unload</em> our model, to free some memory.</p>
 <pre class="r"><code>unloadModel()</code></pre>
 </div>

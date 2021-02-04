@@ -357,37 +357,37 @@ library(tidyverse)</code></pre>
 </div>
 <div id="loading-the-model" class="section level1">
 <h1>Loading the model</h1>
-<p>We will work with model <a href="https://www.ebi.ac.uk/biomodels/BIOMD0000000023">Nr. 23 in BioModels</a><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001).</p>
+<p>We will work with model <a href="https://www.ebi.ac.uk/biomodels/BIOMD0000000023">Nr. 23 in BioModels</a><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001). The model is stored in this repository but can also be loaded directly from the biomodels database (see commented out line).</p>
 <pre class="r"><code>loadSBML(&quot;https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml&quot;)
 #&gt; # A COPASI model reference:
 #&gt; Model name: &quot;Rohwer2001_Sucrose&quot;
 #&gt; Number of compartments: 1
 #&gt; Number of species: 13
-#&gt; Number of reactions: 11</code></pre>
+#&gt; Number of reactions: 11
+# loadSBML(&quot;https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000023_url.xml&quot;)</code></pre>
 <p>We will first take a look at the reactions:</p>
 <pre class="r"><code>getReactions()
 #&gt; # A tibble: 11 x 6
-#&gt;    key   name  reaction rate_law  flux
-#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;dbl&gt;
-#&gt;  1 (v1)  v1    Fruex =~ Functio~     0
-#&gt;  2 (v2)  v2    Glcex =~ Functio~     0
-#&gt;  3 (v3)  v3    ATP + G~ Functio~     0
-#&gt;  4 (v4)  v4    Fru + A~ Functio~     0
-#&gt;  5 (v5)  v5    Fru + A~ Functio~     0
-#&gt;  6 (v6)  v6    2 * Hex~ Functio~     0
-#&gt;  7 (v7)  v7    Suc6P =~ Functio~     0
-#&gt;  8 (v8)  v8    HexP + ~ Functio~     0
-#&gt;  9 (v9)  v9    Suc = F~ Functio~     0
-#&gt; 10 (v10) v10   HexP = ~ Functio~     0
-#&gt; 11 (v11) v11   Suc = S~ Functio~     0
-#&gt; # ... with 1 more variable:
-#&gt; #   number_flux &lt;dbl&gt;</code></pre>
+#&gt;    key   name  reaction              rate_law                   flux number_flux
+#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;                 &lt;chr&gt;                     &lt;dbl&gt;       &lt;dbl&gt;
+#&gt;  1 (v1)  v1    Fruex = Fru           FunctionDB.Functions[Fun~     0           0
+#&gt;  2 (v2)  v2    Glcex = Glc           FunctionDB.Functions[Fun~     0           0
+#&gt;  3 (v3)  v3    ATP + Glc = HexP + A~ FunctionDB.Functions[Fun~     0           0
+#&gt;  4 (v4)  v4    Fru + ATP = HexP + A~ FunctionDB.Functions[Fun~     0           0
+#&gt;  5 (v5)  v5    Fru + ATP = HexP + A~ FunctionDB.Functions[Fun~     0           0
+#&gt;  6 (v6)  v6    2 * HexP = UDP + Suc~ FunctionDB.Functions[Fun~     0           0
+#&gt;  7 (v7)  v7    Suc6P = Suc + phos    FunctionDB.Functions[Fun~     0           0
+#&gt;  8 (v8)  v8    HexP + Fru = Suc + U~ FunctionDB.Functions[Fun~     0           0
+#&gt;  9 (v9)  v9    Suc = Fru + Glc       FunctionDB.Functions[Fun~     0           0
+#&gt; 10 (v10) v10   HexP = glycolysis     FunctionDB.Functions[Fun~     0           0
+#&gt; 11 (v11) v11   Suc = Sucvac          FunctionDB.Functions[Fun~     0           0</code></pre>
 <p>Of interest to us are reactions <em>v11</em> (accumulation of sucrose in vacuoles) and <em>v9</em> (hydrolysis of sucrose), which decreases our overall productivity.</p>
-<p>We can see the behavior of these two species over time in this plot: <img src="optimization_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+<p>We can see the behavior of these two species over time in this plot:</p>
+<p><img src="optimization_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
 </div>
 <div id="the-objective-function" class="section level1">
 <h1>The objective function</h1>
-<p>We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis. $J_{v11}/J_{v9} $. For our optimization algorithms it is necessary to define our optimization goal as a minimum: we want to minimize <span class="math inline">\(J_{v9}/J_{v11}\)</span></p>
+<p>We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis. <span class="math inline">\(J_{v11}/J_{v9}\)</span>. For our optimization algorithms it is necessary to define our optimization goal as a minimum: we want to minimize <span class="math inline">\(J_{v9}/J_{v11}\)</span></p>
 <p>What we just defined is called an <em>objective function</em>.</p>
 <p>In <strong>CoRC</strong> we can define the objective function like this:</p>
 <pre class="r"><code>objf &lt;- paste0(reaction(&quot;(v9)&quot;, reference = &quot;Flux&quot;), &quot;/&quot;, reaction(&quot;(v11)&quot;, reference = &quot;Flux&quot;))
@@ -397,7 +397,7 @@ getValue(objf)
 <div id="the-parameters" class="section level1">
 <h1>The parameters</h1>
 <p>Now we have to think about, what we are able to change to reach the minimum possible value for our objective function. We can assume for this teaching example that we are able to manipulate the steady state levels of our enzymes in reactions <em>v1</em>, <em>v2</em>, <em>v3</em>, <em>v4</em> and <em>v5</em>.</p>
-<p>We have to tell <strong>CoRC</strong> about our optimization parameters like this: We could also specify our parameters more closely, e.g. give them a specific starting value or bounds on how far the estimation is allowed to search. We will say that we can downregulate an enzyme by 50% and overexpress it by 400%. The start values are supposed to be the current values in our model.</p>
+<p>We have to define our optimization parameters in <strong>CoRC</strong>. It is possible to specify several aspects of our parameters, e.g. give them a specific starting value or bounds on how far the estimation is allowed to search. We will say that we can downregulate an enzyme by 50% or overexpress it by 400%. The start values are going to be the current values in our model.</p>
 <pre class="r"><code>make_opt_param &lt;- function(name) {
   value_ref &lt;- parameter_strict(name, reference = &quot;Value&quot;)
   value &lt;- getValue(value_ref)
@@ -411,12 +411,17 @@ parameters &lt;- lapply(c(&quot;(v1).Vmax1&quot;, &quot;(v2).Vmax2&quot;, &quot;
 </div>
 <div id="optimization-method" class="section level1">
 <h1>Optimization method</h1>
-<p>Now we have to choose which optimization method we will use for optimization. For our first try we will use <em>Truncated Newton</em>. There are a lot of different methods available in <strong>CoRC</strong> which you can find in the documentation of the runOptimization() function.</p>
+<p>Now we have to choose which optimization method we will use for optimization. For our first try we will use <em>Truncated Newton</em>. There are a lot of different methods available in <strong>CoRC</strong> which you can find in the documentation of the <code>runOptimization()</code> function.</p>
 <pre class="r"><code>method &lt;- &#39;TruncatedNewton&#39;</code></pre>
 </div>
 <div id="optimization" class="section level1">
 <h1>Optimization</h1>
-<p>Now we have all elements we need for our optimization routine. We still need to specify a few arguments in our function: * subtask: Our subtask is optimization. We could also run a Steady State Analysis or a Scan with this function * randomize_start_values: We just took the time specifying where our start values are so we don’t want to randomize them all again. If we think we always find a local minimum instead of a global one, it might be helpful to randomize the start values. * update_model: We will save our current parameter values, so we can update the model in this function and not lose them.</p>
+<p>Now we have all elements we need for our optimization routine. We still need to specify a few arguments in our function:</p>
+<ul>
+<li>subtask: Our subtask is optimization. We could also run a Steady State Analysis or a Scan with this function.</li>
+<li>randomize_start_values: We just took the time specifying where our start values are so we don’t want to randomize them all again. If we think we always find a local minimum instead of a global one, it might be helpful to randomize the start values.</li>
+<li>update_model: We will save our current parameter values, so we can update the model in this function and not lose them.</li>
+</ul>
 <pre class="r"><code>par_before &lt;- getParameters()$value
 
 result &lt;- runOptimization(expression = objf,
@@ -429,16 +434,16 @@ result$main$objective_value
 #&gt; [1] 0.07816841
 result$parameters
 #&gt; # A tibble: 5 x 6
-#&gt;   parameter lower_bound start_value  value
-#&gt;   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;
-#&gt; 1 (v1).Vma~      0.143       0.339  0.339 
-#&gt; 2 (v2).Vma~      0.143       0.342  0.342 
-#&gt; 3 (v3).Vma~      0.0985      0.0985 0.0985
-#&gt; 4 (v4).Vma~      0.0985      0.196  0.196 
-#&gt; 5 (v5).Vma~      0.082       0.134  0.134 
-#&gt; # ... with 2 more variables:
-#&gt; #   upper_bound &lt;dbl&gt;, gradient &lt;dbl&gt;</code></pre>
-<p>Our new model with the updated parameter values looks like this: <img src="optimization_files/figure-html/unnamed-chunk-10-1.png" width="100%" /> The dashed lines where from the timecourse before the optimization, so we can see that our optimization routine worked!</p>
+#&gt;   parameter  lower_bound start_value  value upper_bound gradient
+#&gt;   &lt;chr&gt;            &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (v1).Vmax1      0.143       0.339  0.339        1.14  -0.254  
+#&gt; 2 (v2).Vmax2      0.143       0.342  0.342        1.14  -0.225  
+#&gt; 3 (v3).Vmax3      0.0985      0.0985 0.0985       0.788  1.21   
+#&gt; 4 (v4).Vmax4      0.0985      0.196  0.196        0.788  0.00801
+#&gt; 5 (v5).Vmax5      0.082       0.134  0.134        0.656  0.185</code></pre>
+<p>Our new model with the updated parameter values looks like this:</p>
+<p><img src="optimization_files/figure-html/unnamed-chunk-10-1.png" width="100%" /></p>
+<p>The dashed lines were from the timecourse before the optimization, so we can see that our optimization routine worked very well!</p>
 <div id="references" class="section level2">
 <h2>References</h2>
 </div>

@@ -1,0 +1,2 @@
+Das sind die .Rmd files die die .html files erstellen. Das parameter_shiny.Rmd erstellt kein html, weil man das auf shiny hosten müsste (ist quasi das gleiche dokument 
+wie parameter.Rmd nur dass am anfang eine shinyapp ist, wo man über slider selber parameter estimation machen kann.
