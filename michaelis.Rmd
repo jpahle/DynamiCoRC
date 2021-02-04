@@ -223,7 +223,7 @@ As we can see, our inbuilt reaction still needs some parameters set. The $K_M$ w
 $$K_M = \frac{k_r + k_{cat}}{k_f} $$
 
 The parameters in our model correspond to (from top to bottom): $k_f$, $k_r$, $k_{cat}$.
-All of them are 0.1 so for $K_M$ we get $K_M = 0.2 / 0.1 = 2 $.
+All of them are 0.1 so for $K_M$ we get $K_M = 0.2 / 0.1 = 2$.
 
 Finding the $v_{max}$ is a bit more tricky. We defined:
 $$ V_{max} = [E_0]*k_{cat} $$

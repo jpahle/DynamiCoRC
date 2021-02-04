@@ -62,7 +62,7 @@ ggplot(data = tc1) +
 # The objective function
 
 We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis.
-$J_{v11}/J_{v9} $.
+$J_{v11}/J_{v9}$.
 For our optimization algorithms it is necessary to define our optimization goal as a minimum: we want to minimize $J_{v9}/J_{v11}$
 
 What we just defined is called an *objective function*.
