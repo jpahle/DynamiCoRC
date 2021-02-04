@@ -246,7 +246,7 @@ after <- runTimeCourse(duration = 1000, dt = 1)$result
 We will use ggplot for visualizing our results.
 If you have never worked with ggplot, this way to define a plot will look unusual to you. 
 
-We first want to plot our expermental data, as well as two time courses (before and after) for Erk2-P and Mos-P. 
+We first want to plot our experimental data, as well as two time courses (before and after) for *Erk2-P* and *Mos-P*. 
 
 ```{r}
 Erk2P <- 
