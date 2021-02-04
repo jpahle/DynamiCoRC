@@ -93,7 +93,7 @@ plotdata <-
   bind_rows() %>%
   group_by(Time) %>%
   # calculate mean and sd for all time points
-  summarise(across(everything(), list(mean = stats::mean, sd = stats::sd)), .groups = "drop") %>%
+  summarise(across(everything(), list(mean = base::mean, sd = stats::sd)), .groups = "drop") %>%
   # gather all values so the column `name` identifies "a_mean", "b_sd" etc.
   pivot_longer(-Time) %>%
   # split up information on species (a, b, c) and type of value (mean, sd)
