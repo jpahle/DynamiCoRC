@@ -32,8 +32,8 @@ The points are measurements of two of the species in the model.
 
 ```{r, echo = FALSE}
 data <- read.table("MAPKdata1.txt", header = TRUE)
-loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000010_url.xml")
-# loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
+loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000010_url.xml")
 
 data_print <- data %>% pivot_longer(-Time, names_to = "names", values_to = "values")
       
@@ -83,8 +83,8 @@ If you want to know how to build you own model, you can [klick here](https://jpa
 In this workflow, we will instead load a SMBL-model. This model is from Kholodenko (2000)[^2]
 
 ```{r}
-loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000010_url.xml")
-# loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
+loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000010_url.xml")
 ```
 
 We can inspect the species of the model like this:

@@ -38,8 +38,8 @@ We will work with model [Nr. 23 in BioModels](https://www.ebi.ac.uk/biomodels/BI
 The model is stored in this repository but can also be loaded directly from the biomodels database (see commented out line).
 
 ```{r}
-loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000023_url.xml")
-# loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml")
+loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml")
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000023_url.xml")
 ```
 
 We will first take a look at the reactions:

@@ -48,8 +48,8 @@ This is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0
 First, we always have to load our model:
 
 ```{r}
-loadModel("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/stochastic_test.cps")
-# loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
+loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
+# loadModel("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/stochastic_test.cps")
 ```
 
 Now, we will set our timecourse settings and save our model to a string so we can load it again later for our parallel processing. 
@@ -134,8 +134,8 @@ This implements an example from the [Mendes 2009 paper](https://doi.org/10.1007/
 We will load the model, set the steady state settings, and save our model as a string to load it in parallel later.
 
 ```{r}
-loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000068_url.xml")
-# loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000068.2?filename=BIOMD0000000068_url.xml")
+loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000068.2?filename=BIOMD0000000068_url.xml")
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamicPublicationMediaManuscript/main/models/BIOMD0000000068_url.xml")
 
 setSteadyStateSettings(calculate_jacobian = FALSE, perform_stability_analysis = FALSE)
 
