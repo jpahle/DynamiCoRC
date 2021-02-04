@@ -142,7 +142,7 @@ setSteadyStateSettings(calculate_jacobian = FALSE, perform_stability_analysis = 
 model_string <- saveModelToString()
 ```
 
-This time, we will run 10000 stady-state calculations with random concentrations of two species (cysteine and adomed). 
+This time, we will run 1000 stady-state calculations with random concentrations of two species (cysteine and adomed). 
 
 We will export the model to the workers, load CoRC and the model.
 Then we will assign random concentrations and run a steady state calculation:
@@ -158,8 +158,8 @@ scan <-
       library(CoRC)
       loadModelFromString(model_string)
     }),
-    # iteration data (10000 random seeds)
-    1:10000,
+    # iteration data (1000 random seeds)
+    1:1000,
     # iteration function using the seed values
     function(seed) {
       set.seed(seed)
