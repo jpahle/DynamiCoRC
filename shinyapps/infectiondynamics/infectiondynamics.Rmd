@@ -1,0 +1,848 @@
+---
+title: Infection dynamics
+author: Johanna Daas, Jonas Förster and Jürgen Pahle
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+    source_code: embed
+    navbar:
+      - {icon: "fa-github", href: "https://github.com/jpahle/DynamiCoRC"}
+runtime: shiny
+---
+<!--- Setup, Data, etc--->
+
+```{r setup}
+# R markdown / flexdashboard options
+knitr::opts_chunk$set(
+  echo = FALSE,
+  error = FALSE,
+  fig.width = 12,
+  # 4/3 asp ratio is the default. When putting 2 plots in a row, divide by, 3 plot by 3, etc...
+  fig.asp = 12/16,
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+# Housekeeping
+seed <- 2708
+set.seed(seed)
+library(CoRC)
+library(tidyverse)
+library(shiny)
+library(ISOweek)
+library(knitr)
+library(ggpubr)
+
+theme_set(theme_classic())
+```
+
+```{r global}
+# Data
+if (file.exists("nationalcasedeath_snapshot.rds")) {
+  data_df <- readRDS(file = "nationalcasedeath_snapshot.rds")
+  timestamp <- attr(data_df, "timestamp")
+}
+
+# Older than 10 days triggers a reload
+if (!exists("timestamp", inherits = FALSE) || is.null(timestamp) || ((Sys.Date() - timestamp) > 10)) {
+  message("Getting fresh data")
+  tryCatch({
+    data_new_df <- as_tibble(read.csv("https://opendata.ecdc.europa.eu/covid19/nationalcasedeath/csv/data.csv", na.strings = c("", "NA"), fileEncoding = "UTF-8-BOM"))
+    timestamp <- Sys.Date()
+    attr(data_new_df, "timestamp") <- timestamp
+    message("saving fresh data")
+    saveRDS(data_new_df, file = "nationalcasedeath_snapshot.rds")
+    data_df <- data_new_df
+  }, error = function(e) {}, warning = function(w) {})
+}
+
+stopifnot(exists("data_df"))
+
+data_df <- data_df %>%
+  separate(year_week, sep = coll("-"), into = c("year", "week")) %>%
+  mutate(
+    date = ISOweek2date(paste0(year, "-W", week, "-7")),
+    across(c(year, week), as.integer)
+  ) %>%
+  # the data is interesting for now but we will fix the app mid 2022
+  filter(year < 2022 | (year == 2022 & week <= 26)) %>%
+  arrange(year, week) %>%
+  mutate(week_running = unclass(fct_inorder(paste0(year, week))))
+
+# for week_running, we assume that there are no missing weeks in between.
+# ensure this in this small sanity check
+years_weeks_df <- distinct(data_df, year, week)
+# either the year is incremented and we start with week 1 or the week is incremented
+stopifnot(all((diff(years_weeks_df$year) == 1 & years_weeks_df$week[-1] == 1) | diff(years_weeks_df$week) == 1))
+
+week2date <- unique(data_df$date)
+latest <- last(week2date)
+
+cases_df <- filter(data_df, country == "Europe (total)", indicator == "cases")
+deaths_df <- filter(data_df, country == "Europe (total)", indicator == "deaths")
+
+cases_eu_latest <- filter(cases_df, date == latest)$cumulative_count
+deaths_eu_latest <- filter(deaths_df, date == latest)$cumulative_count
+
+de_mdl_df <-
+  data_df %>%
+  filter(country == "Germany") %>%
+  select(date, week_running, population, indicator, cumulative_count, weekly_count) %>%
+  pivot_wider(names_from = indicator, values_from = c(cumulative_count, weekly_count)) %>%
+  rename(
+    D.tot = cumulative_count_deaths,
+    D.new = weekly_count_deaths,
+    I.tot = cumulative_count_cases,
+    I.new = weekly_count_cases
+  ) %>%
+  select(date, week_running, D.tot, D.new, I.tot, I.new)
+```
+
+<!--- First TAB: Data --->
+
+Data
+============================
+
+Data and Sources {.sidebar}
+----------------------------
+
+**Sources**
+
+If you want to work with data, it is most important that you can trust it.
+You need to know that you trust your *source*.
+Here on this side we use the weekly updates from the [ECDC](https://www.ecdc.europa.eu/en), the European Centre for Disease Prevention and Control, which is an agency of the European Union.
+This means, that at most, our data is a week old - if you want more current data on COVID-19, you can check the Website of the [Johns Hopkins University](https://coronavirus.jhu.edu/).
+
+**Infections and Deaths**
+
+```{r}
+helpText("Here you can take a look at our data, for infection cases and deaths. \n
+         You have the three classes we defined earlier at your disposal: \n
+         Total Cases/Deaths (dashed), New Cases/Deaths (dotted) and Incidence (full line). \n
+         You can also choose which continent(s) you want to see. \n\n
+         Play around with settings and try to explain what is different.")
+
+radioButtons("caseordeath", h3("Cases or Deaths?"),
+             choices = list("Cases" = "cases",
+                            "Deaths" = "deaths"),
+             selected = "cases")
+
+checkboxGroupInput("lines", h3("What kind of data?"),
+                   choices = list("Total Number" = "total",
+                                  "New Reportings" = "new",
+                                  "Incidence" = "incidence"),
+                   selected = "total")
+
+selectizeInput("continent", h3("Continent(s)"),
+               choices = list("Africa" = "Africa (total)",
+                              "America" = "America (total)",
+                              "Asia" = "Asia (total)",
+                              "Europe" = "Europe (total)",
+                              "Oceania" = "Oceania (total)"),
+               selected = "Europe (total)",
+               options = list(placeholder = 'Select the continent(s)', maxItems = 5))
+```
+
+COVID-19
+---------------------------
+
+As of this week (`r latest`), there were `r cases_eu_latest` cases of and `r deaths_eu_latest` deaths by COVID-19 in the EU.
+On these pages, we will take a look at the data and how to understand it, as well as what infection models are, how they work and why they are useful.
+
+When referring to infection data, it is important to understand what exactly the data is describing.
+We might have
+
+1. The total number of cases since the begin of the epidemic
+2. The number of cases reported in a given timeframe
+3. The incidence
+
+The incidence is a *corrected* measurement of the second.
+It shows how many new infections happen in a given timeframe (here it is 2 weeks) compared to a population of 100.000 people.
+This makes it easier to compare regions with different populations.
+
+For example, city **A** might have only 30 new cases in the span of two weeks, and city **B** has 40, we might think that city **B** is worse off.
+But if we take into account that city **A** has a population of 50'000 and city **B** 200'000 we can compare the incidences.
+
+$$ Incidence  = \frac{new Cases}{Population} * 100000 $$
+$$ City A: \frac{30}{50000} * 100000 = 60 $$
+$$ City B: \frac{40}{200000} * 100000 = 20 $$
+
+As we can see, city A has a much higher *incidence* than city B, which shows that the virus is spreading more rapidly there.
+
+```{r}
+headerPanel("Infections and Deaths")
+plotOutput("data_plot", width = "95%")
+
+output$data_plot <- renderPlot({
+  data_p <- filter(data_df, country %in% input$continent, indicator == input$caseordeath)
+  
+  plot <- ggplot(data = data_p, aes(x = date, color = country))
+  
+  if ("total" %in% input$lines) {
+    plot <- plot +
+     geom_line(aes(y = cumulative_count, linetype = "total"))
+  }
+  
+  if ("new" %in% input$lines) {
+    plot <- plot +
+      geom_line(aes(y = weekly_count, linetype = "new"))
+  }
+  
+  if ("incidence" %in% input$lines) {
+    plot <- plot +
+      geom_line(aes(y = rate_14_day, linetype = "incidence"), na.rm = TRUE)
+  }
+  
+  plot <- plot +
+    scale_linetype_manual(
+      values = c("incidence" = "solid", "new" = "dotted", "total" = "dashed")[input$lines],
+      labels = c("incidence" = "Incidence", "new" = "New Reportings", "total" = "Total Number")
+    ) +
+    labs(x = "Week", y = "Count", color = "Continent", linetype = "Data")
+  
+  plot
+})
+```
+
+Models
+=====
+
+Parameters {.sidebar}
+---
+
+You can choose the parameters for the models here.
+
+```{r}
+sliderInput("beta", "Infection",
+            min = 0, max = 0.1,
+            value = 0.001, step = 0.00001)
+sliderInput("v", "Recovery",
+            min = 0, max = 1,
+            value = 0.5, step = 0.00001)
+sliderInput("d", "Death",
+            min = 0, max = 1,
+            value = 0.001, step = 0.00001)
+sliderInput("vac", "Vaccination",
+            min = 0, max = 1,
+            value = 0.1, step = 0.0001)
+
+actionButton("reset", "Reset")
+observeEvent(input$reset, {
+  updateSliderInput(inputId = "beta", value = 0.001)
+  updateSliderInput(inputId = "v", value = 0.5)
+  updateSliderInput(inputId = "d", value = 0.001)
+  updateSliderInput(inputId = "vac", value = 0.1)
+})
+```
+
+The Models
+----
+
+Models *try* to describe reality but they never truly will.
+Still, they can be helpful in understanding reality.
+
+To make a model, we need to make **assumptions** about who interacts with each other and in which way.
+For our first infection model (called SIR-Model), we assume:
+
+**The actors**
+In a model, parts that can interact with each other are called *species*.
+For the first model, we assume, that there are three species.
+Infected individuals ($I$), individuals that can get infected (called susceptibles, $S$) and individuals that were infected and cannot be infected anymore (called recovered / removed, $R$).
+We also assume in what quantities these species are at the begin of our simulation.
+We say, that there is only one infected and no recovered among a population of 1000 (this is an arbitrary number) susceptibles.
+
+**The interaction**
+We also assume the interaction between these species: Susceptibles can be infected when interacting with an infected individual.
+Infected can recover.
+We call these interactions *reactions*.
+
+**The parameters**
+While species describe who exists in our model, and reactions describe how they interact, we also need a measurement on *how strongly or how fast* they interact.
+We call this the parameters. In our first model, we have two parameters, one regulating the the infection and the other the recovery.
+You can try out how the parameters affect the model on the left.
+
+```{r}
+headerPanel("SIR-Model")
+helpText("Try out how the parameters affect the model with the sliders on the left")
+plotOutput("modelSIR", width = "95%")
+
+mdl_sir <- newModel()
+setModelName("simpleSIR")
+invisible(newReaction("I + S -> 2 * I"))
+invisible(newReaction("I -> R"))
+
+setCompartments(compartment(), initial_size = 1e-24)
+setSpecies(species(), initial_number = c(1, 1000, 0))
+setTimeCourseSettings(duration = 50, update_model = FALSE)
+
+output$modelSIR <- renderPlot({
+  setParameters(key = parameter(), value = c(input$beta, input$v), model = mdl_sir)
+
+  tc <- runTimeCourse(model = mdl_sir)$result_number
+  
+  tc %>%
+    pivot_longer(-Time, names_to = "names", values_to = "values") %>%
+    ggplot(aes(x = Time, y = values, color = names)) +
+    geom_line() +
+    labs(x = "Time", y = "Count", color = "Actors")
+})
+```
+
+Our (mathematical) model looks like this:
+
+$$ S + I \xrightarrow{infection} 2* I$$
+$$ I \xrightarrow{recovery} R $$
+
+If a suseptible individual interacts with an infected individual, they are now **both** infected.
+This process is called *infection*.
+An infected individual can *recover*.
+We can controll two parameters here.
+One for the speed of infection and one for the speed of recovery.
+Try it out yourself, by moving the sliders on the right.
+
+```{r}
+headerPanel("SIRD-Model")
+helpText("The SIRD-model introduces Death.")
+plotOutput("modelSIRD", width = "95%")
+
+mdl_sird <- newModel()
+setModelName("simpleSIR")
+invisible(newReaction("I + S -> 2 * I"))
+invisible(newReaction("I -> R"))
+invisible(newReaction("I -> D"))
+
+setCompartments(compartment(), initial_size = 1e-24)
+setSpecies(species(), initial_number = c(1, 1000, 0, 0))
+setTimeCourseSettings(duration = 50, update_model = FALSE)
+
+output$modelSIRD <- renderPlot({
+  setParameters(key = parameter(), value = c(input$beta, input$v, input$d), model = mdl_sird)
+
+  tc <- runTimeCourse(model = mdl_sird)$result_number
+  
+  tc %>%
+    pivot_longer(-Time, names_to = "names", values_to = "values") %>%
+    ggplot(aes(x = Time, y = values, color = names)) +
+    geom_line() +
+    labs(x = "Time", y = "Count", color = "Actors")
+})
+```
+
+In the next model, we will introduce a new species and reaction.
+Up until now, we assume that infected individuals can only recover from the infection.
+But that is not likely the case. We can assume, that some infected individuals will die ($D$).
+Our new mathematical model (we can call it SIRD-Model) looks like this now:
+
+$$ S + I \xrightarrow{infection} 2*I $$
+$$ I \xrightarrow{recovery} R $$
+$$ I \xrightarrow{death} D $$
+
+Notice, how the first two lines of the models look like the SIR-Model. We just added a reaction controlling death.
+
+Just by looking at these reactions, you can probably see what an important part the parameters play here.
+Will infected individuals recover or die? This is up to the velocity or probability of each reaction.
+
+```{r}
+headerPanel("Vaccination")
+helpText("Vaccination takes susceptible individuals and makes them insusceptibe (R) without having to be infected first.")
+plotOutput("modelSIRVD", width = "95%")
+
+model_sirvd <- newModel()
+setModelName("simpleSIR")
+invisible(newReaction("I + S -> 2 * I"))
+invisible(newReaction("I -> R"))
+invisible(newReaction("I -> D"))
+invisible(newReaction("S -> R"))
+
+setCompartments(compartment(), initial_size = 1e-24)
+setSpecies(species(), initial_number = c(1, 1000, 0, 0))
+setTimeCourseSettings(duration = 50, update_model = FALSE)
+
+output$modelSIRVD <- renderPlot({
+  setParameters(parameter(), value = c(input$beta, input$v, input$d, input$vac), model = model_sirvd)
+
+  tc <- runTimeCourse(model = model_sirvd)$result_number
+  
+  tc %>%
+    pivot_longer(-Time, names_to = "names", values_to = "values") %>%
+    ggplot(aes(x = Time, y = values, color = names)) +
+    geom_line() +
+    labs(x = "Time", y = "Count", color = "Actors")
+})
+```
+
+We can also take precautions against getting our susceptible population infected.
+In the last model, we try to minimize infection and death by removing our susceptibles before they can get infected.
+We *vaccinate*, so they can no longer get infected. Our new mathematical model will look like this:
+
+$$ S + I \xrightarrow{infection} I $$
+$$ I \xrightarrow{recovery} R $$
+$$ I \xrightarrow{death} D $$
+$$ S \xrightarrow{vaccination} R $$
+
+Models and Data
+======
+
+The models illustrated in the previous page, will generally not perfectly predict the future or describe the present.
+As for everything, the real world is exceedingly complex.
+You can probably already think of a lot of things that change the behavior of infection:
+
+For example, we did not take into account that parameters affecting infection, recovery and death vary between age groups.
+Also, finding infected individuals (via testing) and quarantining them will slow the spread of the infection because fewer susceptibles will be infected.
+But still, our model might be of value.
+
+For the following part, we will use the SIRD-Model and compare it to real data for Germany. You can see the data here:
+
+```{r, fig.show="hold", out.width="50%", fig.width=8}
+# define for each wave, the spanning weeks, spanning weeks for plotting and the artificial delay to allow better fitting
+waves_df <-
+  tribble(
+    ~n, ~start, ~end, ~viz_start, ~viz_end, ~fit_delay,
+     1,      9,   23,          4,       25,          0,
+     2,     39,   59,         37,       61,          0,
+     3,     60,   79,         58,       81,          2,
+  )
+
+waves_df <-
+  waves_df %>%
+  mutate(span = map2(start, end, c), viz_span = map2(viz_start, viz_end, c)) %>%
+  left_join(select(de_mdl_df, week_running, D.tot, I.tot), by = c("start" = "week_running"))
+
+waves <-
+  waves_df %>%
+  select(-n) %>%
+  transpose()
+
+scale_color_case_death <- scale_color_manual(values = c("Cases" = "#F8766D", "Deaths" = "#00BFC4"))
+
+plot_total <- ggplot(data = de_mdl_df, aes(x = date)) +
+  geom_rect(data = waves_df, aes(x = NULL, xmin = week2date[start], xmax = week2date[end], ymin = -Inf, ymax = Inf, fill = as.factor(n)), alpha = 0.3) +
+  geom_line(aes(y = I.tot, color = "Cases")) +
+  geom_line(aes(y = D.tot, color = "Deaths")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-6)) +
+  scale_color_case_death +
+  labs(x = "Date", y = "Total Cases / Deaths (in millions)", fill = "Wave", color = "Statistic" )
+
+plot_new <- ggplot(data = de_mdl_df) +
+  geom_rect(data = waves_df, aes(x = NULL, xmin = week2date[start], xmax = week2date[end], ymin = -Inf, ymax = Inf, fill = as.factor(n)), alpha = 0.3) +
+  geom_line(aes(x = date, y = I.new, color = "Cases")) +
+  geom_line(aes(x = date, y = D.new, color = "Deaths")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  labs(x = "Date", y = "New Cases / Deaths (in thousands)", fill = "Wave", color = "Statistic")
+```
+<!-- fix for broken figure scaling, have to wrap in div -->
+<div class = 'center'>
+```{r, fig.show="hold", fig.asp = 6/16}
+ggarrange(plot_new, plot_total, nrow = 1, legend = "top", common.legend = TRUE)
+```
+</div>
+
+When comparing this to the model, we can see, that the model on the previous page does not accurately predict the behavior.
+In the model, there is only one wave, and in the data we can already see 3 distinct waves up to mid 2021.
+We want to see how these waves differ and try to *fit* our model to each wave.
+
+Fitting means, that we try to find the parameters and settings that allow the model to closely reproduce the data.
+In concrete terms, we will fit the parameters for infection, recovery and deaths, as well as the number of infected at the beginning of the simulation. 
+
+```{r}
+# prepare waves data for fitting
+prepare_wave_df <- function(i) {
+  de_mdl_df %>%
+  filter(between(week_running, waves[[i]]$start, waves[[i]]$end)) %>%
+  mutate(
+    week = week_running - first(week_running),
+    D.tot = D.tot - first(D.tot),
+    I.tot = I.tot - first(I.tot)
+  )
+}
+
+wave1_df <- prepare_wave_df(1)
+# adjustment span for the data, so the model will have some time to start
+wave1_adj_df <- mutate(wave1_df, week = week + waves[[1]]$fit_delay)
+
+wave2_df <- prepare_wave_df(2)
+wave2_adj_df <- mutate(wave2_df, week = week + waves[[2]]$fit_delay)
+
+wave3_df <-
+  prepare_wave_df(3) %>%
+  # cut off the end of the wave for fitting
+  head(-9)
+wave3_adj_df <- mutate(wave3_df, week = week + waves[[3]]$fit_delay)
+```
+
+```{r, include=FALSE}
+# Prepare the model for fitting to the waves
+
+mdl_wave1 <- newModel()
+setModelName("simpleSIRD")
+
+newReaction("I + S -> 2 * I", name = "infection")
+newReaction("I -> R", name = "recovery")
+newReaction("I -> D", name = "death")
+
+setCompartments("compartment", initial_size = 1e-24)
+setSpecies(c("I", "S", "R", "D"), initial_number = c(1, 83e6, 0, 0))
+setParameters(c("(infection).k1", "(recovery).k1", "(death).k1"), value = c(1e-5, 1, 0.1))
+
+newGlobalQuantity(name = "I.new",
+                  type = "assignment",
+                  expression = "-{S.ParticleNumberRate}")
+
+newGlobalQuantity(name = "D.new",
+                  type = "assignment",
+                  expression = "{D.ParticleNumberRate}")
+newGlobalQuantity(name = "I.tot",
+                  type = "assignment",
+                  expression = "{S.InitialParticleNumber}-{S.ParticleNumber}")
+
+# Parameters
+fit_parameters <- list(
+ defineParameterEstimationParameter(
+   ref = "{(infection).k1}",
+   start_value = 1e-4,
+   lower_bound = 1e-12,
+   upper_bound = 1
+ ),
+ defineParameterEstimationParameter(
+   ref = "{(recovery).k1}",
+   start_value = 1e-4,
+   lower_bound = 1e-12,
+   upper_bound = 1
+ ),
+ defineParameterEstimationParameter(
+   ref = "{(death).k1}",
+   start_value = 1e-4,
+   lower_bound = 1e-12,
+   upper_bound = 1
+ ),
+ defineParameterEstimationParameter(
+   ref = "{I.InitialParticleNumber}",
+   start_value = 1,
+   lower_bound = 1,
+   upper_bound = 83e6
+ ),
+ defineParameterEstimationParameter(
+   ref = "{S.InitialParticleNumber}",
+   start_value = 83e6,
+   lower_bound = 1,
+   upper_bound = 83e6
+ )
+)
+
+mdl_string <- saveModelToString()
+mdl_wave2 <- loadModelFromString(mdl_string)
+mdl_wave3 <- loadModelFromString(mdl_string)
+```
+
+**First Wave**
+
+When we now fit the first wave, we can see how closely we can get our model to fit the data. 
+
+```{r, include=FALSE}
+# Experiment
+fit_experiment <- defineExperiments(
+  data = wave1_adj_df,
+  experiment_type = "time_course",
+  types = c(week = "time", D.tot = "dependent", D.new = "dependent", I.tot = "dependent", I.new = "dependent"),
+  mapping = c(D.tot = "{D.ParticleNumber}", D.new = "{Values[D.new]}", I.tot = "{Values[I.tot]}", I.new = "{Values[I.new]}"),
+  weight_method = "mean_square"
+)
+
+# Run
+est_wave1 <- runParameterEstimation(
+  parameters = fit_parameters,
+  experiments = fit_experiment,
+  method = list(
+    method = "ParticleSwarm",
+    swarm_size = 12,
+    seed = seed,
+    iteration_limit = 1000
+  ),
+  update_model = TRUE,
+  model = mdl_wave1
+)
+
+fitted_parms_1 <- est_wave1$parameters %>% select(parameter, value) %>% deframe()
+```
+
+```{r, include=FALSE}
+delay_weeks <- waves[[1]]$fit_delay
+wave_start <- waves[[1]]$start
+tc_wave1 <- runTC(duration = diff(waves[[1]]$viz_span) + delay_weeks, model = mdl_wave1)$result
+
+scale_linetype_mdlvsdata <- scale_linetype_manual(values = c("Fitting data" = "solid", "Extended data" = "dashed", "Fitted model" = "dotted"))
+
+plot1_new <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = I.new, color = "Cases", linetype = "Extended data")) +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = D.new, color = "Deaths", linetype = "Extended data")) +
+  geom_line(data = wave1_df, aes(x = week, y = I.new, color = "Cases", linetype = "Fitting data")) +
+  geom_line(data = wave1_df, aes(x = week, y = D.new, color = "Deaths", linetype = "Fitting data")) +
+  geom_line(data = tc_wave1, aes(x = Time - delay_weeks, y = `Values[I.new]`, color = "Cases", linetype = "Fitted model")) +
+  geom_line(data = tc_wave1, aes(x = Time - delay_weeks, y = `Values[D.new]`, color = "Deaths", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[1]]$viz_span - wave_start, ylim = c(0, max(wave1_df$I.new, tc_wave1$`Values[I.new]`))) +
+  labs(x = "Week", y = "New Cases / Deaths (in thousands)", color = "Indicator", linetype = "Source")
+
+plot1_deaths <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = D.tot - waves[[1]]$D.tot, color = "Deaths", linetype = "Extended data")) +
+  geom_line(data = wave1_df, aes(x = week, y = D.tot, color = "Deaths", linetype = "Fitting data")) +
+  geom_line(data = tc_wave1, aes(x = Time - delay_weeks, y = D, color = "Deaths", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[1]]$viz_span - wave_start, ylim = c(0, max(wave1_df$D.tot, tc_wave1$`D`))) +
+  labs(x = "Week", y = "Total Deaths (in thousands)", color = "Indicator", linetype = "Source")
+
+plot1_cases <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = I.tot - waves[[1]]$I.tot, color = "Cases", linetype = "Extended data")) +
+  geom_line(data = wave1_df, aes(x = week, y = I.tot, color = "Cases", linetype = "Fitting data")) +
+  geom_line(data = tc_wave1, aes(x = Time - delay_weeks, y = `Values[I.tot]`, color = "Cases", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[1]]$viz_span - wave_start, ylim = c(0, max(wave1_df$I.tot, tc_wave1$`Values[I.tot]`))) +
+  labs(x = "Week", y = "Total Cases (in thousands)", color = "Indicator", linetype = "Source")
+```
+<div class = 'center'>
+```{r, fig.show="hold", fig.asp = 4/16}
+ggarrange(plot1_new, plot1_deaths, plot1_cases, nrow = 1, legend = "top", common.legend = TRUE)
+```
+</div>
+
+The fitted parameters are `r fitted_parms_1["(infection).k1"]` (infection), `r fitted_parms_1["(recovery).k1"]` (recovery), `r fitted_parms_1["(death).k1"]` (death), `r fitted_parms_1["I.InitialParticleNumber"]` (initial infected), `r fitted_parms_1["S.InitialParticleNumber"]` (susceptibles).
+
+We can see that for the new Reports (left panel), the model (dotted line) closely mimics the data (solid line) during the fitted timespan.
+This is the case for both the case numbers (red) and deaths (blue).
+
+The total deaths (middle panel) are a bit overestimated, while the total infections (right panel) look very similar.
+
+So, how does our model look right now?
+
+The actors of the model are the same as of the SIRD-model.
+The interactions of these actors also do not change while fitting.
+What does change are the *parameters*. How fast is the infection spreading?
+How quick is the recovery?
+But also, how many individuals were infected in the beginning and how many susceptibles are there?
+
+**Second Wave**
+
+We can do the same for the second wave now.
+
+```{r, include=FALSE}
+# Experiment
+fit_experiment <- defineExperiments(
+  data = wave2_adj_df,
+  experiment_type = "time_course",
+  types = c(week = "time", D.tot = "dependent", D.new = "dependent", I.tot = "dependent", I.new = "dependent"),
+  mapping = c(D.tot = "{D.ParticleNumber}", D.new = "{Values[D.new]}", I.tot = "{Values[I.tot]}", I.new = "{Values[I.new]}"),
+  weight_method = "mean_square"
+)
+
+# Run
+est_wave2 <- runParameterEstimation(
+  parameters = fit_parameters,
+  experiments = fit_experiment,
+  method = list(
+    method = "ParticleSwarm",
+    swarm_size = 14,
+    seed = seed,
+    iteration_limit = 1000
+  ),
+  update_model = TRUE,
+  model = mdl_wave2
+)
+
+fitted_parms_2 <- est_wave2$parameters %>% select(parameter, value) %>% deframe()
+```
+
+```{r, include=FALSE}
+delay_weeks <- waves[[2]]$fit_delay
+wave_start <- waves[[2]]$start
+tc_wave2 <- runTC(duration = diff(waves[[2]]$viz_span) + delay_weeks, model = mdl_wave2)$result
+
+plot2_new <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = I.new, color = "Cases", linetype = "Extended data")) +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = D.new, color = "Deaths", linetype = "Extended data")) +
+  geom_line(data = wave2_df, aes(x = week, y = I.new, color = "Cases", linetype = "Fitting data")) +
+  geom_line(data = wave2_df, aes(x = week, y = D.new, color = "Deaths", linetype = "Fitting data")) +
+  geom_line(data = tc_wave2, aes(x = Time - delay_weeks, y = `Values[I.new]`, color = "Cases", linetype = "Fitted model")) +
+  geom_line(data = tc_wave2, aes(x = Time - delay_weeks, y = `Values[D.new]`, color = "Deaths", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[2]]$viz_span - wave_start, ylim = c(0, max(wave2_df$I.new, tc_wave2$`Values[I.new]`))) +
+  labs(x = "Week", y = "New Cases / Deaths (in thousands)", color = "Indicator", linetype = "Source")
+
+plot2_deaths <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = D.tot - waves[[2]]$D.tot, color = "Deaths", linetype = "Extended data")) +
+  geom_line(data = wave2_df, aes(x = week, y = D.tot, color = "Deaths", linetype = "Fitting data")) +
+  geom_line(data = tc_wave2, aes(x = Time - delay_weeks, y = D, color = "Deaths", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[2]]$viz_span - wave_start, ylim = c(0, max(wave2_df$D.tot, tc_wave2$`D`))) +
+  labs(x = "Week", y = "Total Deaths (in thousands)", color = "Indicator", linetype = "Source")
+
+plot2_cases <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = I.tot - waves[[2]]$I.tot, color = "Cases", linetype = "Extended data")) +
+  geom_line(data = wave2_df, aes(x = week, y = I.tot, color = "Cases", linetype = "Fitting data")) +
+  geom_line(data = tc_wave2, aes(x = Time - delay_weeks, y = `Values[I.tot]`, color = "Cases", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[2]]$viz_span - wave_start, ylim = c(0, max(wave2_df$I.tot, tc_wave2$`Values[I.tot]`))) +
+  labs(x = "Week", y = "Total Cases (in thousands)", color = "Indicator", linetype = "Source")
+```
+<div class = 'center'>
+```{r, fig.show="hold", fig.asp = 4/16}
+ggarrange(plot2_new, plot2_deaths, plot2_cases, nrow = 1, legend = "top", common.legend = TRUE)
+```
+</div>
+
+The quality of the fit looks similar to the one of the first wave.
+
+To compare the fits, we have to look at the parameters again:
+For the fit of the first wave these are `r fitted_parms_2["(infection).k1"]` (infection), `r fitted_parms_2["(recovery).k1"]` (recovery), `r fitted_parms_2["(death).k1"]` (death), `r fitted_parms_2["I.InitialParticleNumber"]` (initial infected), `r fitted_parms_2["S.InitialParticleNumber"]` (susceptibles).
+
+**Comparison**
+
+We can now try and compare these two waves:
+
+```{r}
+allfit <- cbind(`First Wave` = fitted_parms_1, `Second Wave` = fitted_parms_2)
+
+rowdef <- c(
+  `(infection).k1` = 'Infection',
+  `(recovery).k1` = 'Recovery',
+  `(death).k1` = 'Death',
+  `I.InitialParticleNumber` = 'Initial Infected',
+  `S.InitialParticleNumber` = 'Susceptibles'
+)
+
+rownames(allfit) <- rowdef[rownames(allfit)]
+
+kable(allfit, caption = "Parameters of the Fits")
+```
+
+Now, why did the two waves behave differently?
+Our model suggests, that the parameters were different.
+We can try and make theories why the parameters are different.
+
+For example, maybe the rate of infection was lower in the second wave, possibly because people were already more used to the rules of social distancing and adhered to them more effectively.
+The mortality might have decreased, as more hospital beds had been established over time and more progress had been made in treating the disease.
+
+**What to learn from fits**
+
+Because these parameter estimations look so nice, we can be quick to make assumptions about reality.
+But, we always have to keep in mind: How good can our model really be, even if the fit looks perfect?
+
+In our model, we did for example not take into account the rising number of vaccinated individuals.
+And, crucially, we did not make a model, that predicted multiple waves!
+
+Also, a model fit is not like solving a mathematical equation.
+You can think of it more like looking for the lowest point in a terrain: When we go down a hill, our altitude always get's lower until we reach the next hill.
+But, do we know that this point is the lowest when we cannot look over the next mountain? 
+When looking for a good fit, we try to minimize the distance between the model and the data - and try to go down this hill.
+But because the space of all parameters is so vast, we will never be sure, that where we end up is the actual lowest point.
+
+Still, making models and trying to fit data is not useless:
+Making distinct models helps us put into words (and equations), how we think about reality.
+We can then try and look, how well our mental model fits with the data (and reality).
+Even when we find out that our model does not predict the data at all, nothing is lost:
+We simply find, that how we think about a problem is flawed.
+We can see that in the multiple waves in our data.
+None of our models could predict this.
+So we are still missing factors of infection.
+
+**Using models to "predict the future"**
+
+Given that the first two waves were nicely fitted by the model, the next step is to test the models predictive capabilities on another test case.
+The assumption is that if we have a good model and good data, we can predict how our system will behave in the future.
+We can try and give our model only the start of the data of the third wave and test to see whether it predicts well, how the third wave eventually played out according to the data.
+So here we test whether out model is *predictive*.
+
+```{r, include=FALSE}
+# Experiment
+fit_experiment <- defineExperiments(
+  data = wave3_adj_df,
+  experiment_type = "time_course",
+  types = c(week = "time", D.tot = "dependent", D.new = "dependent", I.tot = "dependent", I.new = "dependent"),
+  mapping = c(D.tot = "{D.ParticleNumber}", D.new = "{Values[D.new]}", I.tot = "{Values[I.tot]}", I.new = "{Values[I.new]}"),
+  weight_method = "mean_square"
+)
+
+# Run
+est_wave3 <- runParameterEstimation(
+  parameters = fit_parameters,
+  experiments = fit_experiment,
+  method = list(
+    method = "ParticleSwarm",
+    swarm_size = 17,
+    seed = seed,
+    iteration_limit = 1500
+  ),
+  update_model = TRUE,
+  model = mdl_wave3
+)
+
+fitted_parms_3 <- est_wave3$parameters %>% select(parameter, value) %>% deframe()
+```
+
+```{r, include=FALSE}
+delay_weeks <- waves[[3]]$fit_delay
+wave_start <- waves[[3]]$start
+tc_wave3 <- runTC(duration = diff(waves[[3]]$viz_span) + delay_weeks, model = mdl_wave3)$result
+
+plot3_new <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = I.new, color = "Cases", linetype = "Extended data")) +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = D.new, color = "Deaths", linetype = "Extended data")) +
+  geom_line(data = wave3_df, aes(x = week, y = I.new, color = "Cases", linetype = "Fitting data")) +
+  geom_line(data = wave3_df, aes(x = week, y = D.new, color = "Deaths", linetype = "Fitting data")) +
+  geom_line(data = tc_wave3, aes(x = Time - delay_weeks, y = `Values[I.new]`, color = "Cases", linetype = "Fitted model")) +
+  geom_line(data = tc_wave3, aes(x = Time - delay_weeks, y = `Values[D.new]`, color = "Deaths", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[3]]$viz_span - wave_start, ylim = c(0, max(wave3_df$I.new, tc_wave3$`Values[I.new]`))) +
+  labs(x = "Week", y = "New Cases / Deaths (in thousands)", color = "Indicator", linetype = "Source")
+
+plot3_deaths <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = D.tot - waves[[3]]$D.tot, color = "Deaths", linetype = "Extended data")) +
+  geom_line(data = wave3_df, aes(x = week, y = D.tot, color = "Deaths", linetype = "Fitting data")) +
+  geom_line(data = tc_wave3, aes(x = Time - delay_weeks, y = D, color = "Deaths", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[3]]$viz_span - wave_start, ylim = c(0, max(wave3_df$D.tot, tc_wave3$`D`))) +
+  labs(x = "Week", y = "Total Deaths (in thousands)", color = "Indicator", linetype = "Source")
+
+plot3_cases <- ggplot() +
+  geom_line(data = de_mdl_df, aes(x = week_running - wave_start, y = I.tot - waves[[3]]$I.tot, color = "Cases", linetype = "Extended data")) +
+  geom_line(data = wave3_df, aes(x = week, y = I.tot, color = "Cases", linetype = "Fitting data")) +
+  geom_line(data = tc_wave3, aes(x = Time - delay_weeks, y = `Values[I.tot]`, color = "Cases", linetype = "Fitted model")) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-3)) +
+  scale_color_case_death +
+  scale_linetype_mdlvsdata +
+  coord_cartesian(xlim = waves[[3]]$viz_span - wave_start, ylim = c(0, max(wave3_df$I.tot, tc_wave3$`Values[I.tot]`))) +
+  labs(x = "Week", y = "Total Cases (in thousands)", color = "Indicator", linetype = "Source")
+```
+<div class = 'center'>
+```{r, fig.show="hold", fig.asp = 4/16}
+ggarrange(plot3_new, plot3_deaths, plot3_cases, nrow = 1, legend = "top", common.legend = TRUE)
+```
+</div>
+
+Without all the data (only the timeframe marked with the solid line was given to the model), our model fails to predict the future (dashed line).
+It seems that real life is much more complicated than "people get infected and people recover" and our model is missing some crucial elements.
+A good starting point for extension of the model could therefore be to try to include factors for how the infection rate can change over the course of a wave.
+
+A good example of a working predictive model is weather:
+A weather forecast functions similarly to what we did here.
+You have a (very, very, very) complex model on how the weather behaves and you feed it data on how the weather is right now. 
+Generally, better data enable better the forecasts.

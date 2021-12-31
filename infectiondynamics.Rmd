@@ -1,0 +1,23 @@
+---
+title: Infection Dynamics
+author: Johanna Daas, Jonas Förster and Jürgen Pahle
+output: html_document
+---
+
+# Infection Dynamics
+
+[**Click here**](https://jpahle.shinyapps.io/infectiondynamics/) to go to our interactive Shiny website on infection dynamics which is hosted on the free service of shinyapps.io!
+
+## Why Infection Dynamics
+
+This website was designed to illustrate infection dynamics during the worldwide COVID-19 pandemic, but beyond that, the presented infection models are a great way to show a lay audience how models work.
+
+**First**, we explain and describe the data and make it accessible for interaction and experience.
+
+**Second** come the models: With simple infection dynamics (SIR), it is easy to explain what species, reactions and parameters are. 
+These are the building blocks of models. The least tangible of the three, parameters, is made interactive and readers can see how they affect models.
+Later, some more complex dynamics are introduced.
+
+**Thirdly**, parameter estimation: They are an important aspect of models, as they give the model the necessary descriptiveness of reality. 
+While lay audiences have probably already seen the data and have an own mental model on how infections work, they probably did not yet come into contact with parameter estimation.
+

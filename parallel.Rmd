@@ -1,0 +1,212 @@
+---
+title: Parallel processing with CoRC
+author: Jonas Förster, Johanna Daas and Jürgen Pahle
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.asp = 10/16,
+  out.width = "100%",
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+set.seed(1)
+```
+
+```{r,  message = FALSE}
+library(tidyverse)
+library(parallel)
+library(CoRC)
+```
+
+We will define a function to help us run tasks in parallel on all cores:
+
+```{r}
+mapInParallel <- function(data, fun, ..., .export = character(), .prep = {}) {
+  # make a cluster of r sessions on our local machine
+  cl <- makeCluster(detectCores())
+  # export any variables as specified in the .export argument
+  clusterExport(cl = cl, .export)
+  # prepare the environment by loading packages etc.
+  clusterCall(cl = cl, fun = eval, .prep, env = .GlobalEnv)
+  # evaluate the given code
+  result <- parLapplyLB(cl = cl, X = data, fun = as_mapper(fun), ..., chunk.size = 50)
+  stopCluster(cl)
+  result
+}
+```
+
+# Statistics of Repeated Stochastic Simulations
+
+This is an example from the [Condor-Copasi paper](https://doi.org/10.1186/1752-0509-6-91) [^1].
+
+First, we always have to load our model:
+
+```{r}
+loadModel("https://raw.githubusercontent.com/copasi/condor-copasi/master/examples/stochastic_test.cps")
+# loadModel("https://raw.githubusercontent.com/jpahle/DynamiCoRC/main/models/stochastic_test.cps")
+```
+
+Now, we will set our timecourse settings and save our model to a string so we can load it again later for our parallel processing. 
+
+```{r}
+setTimeCourseSettings(method = list(method = "directMethod",
+                                    use_random_seed = TRUE))
+
+model_string <- saveModelToString()
+```
+
+Next, we will set everything up to run 1000 Timecouses in parallel.
+We need to export our model to the workers, as well as load CoRC and our model for each worker.
+Afterwards, we set 1000 random seeds so each time course will get a different random seed.
+Lastly, we call the timecourse function.
+
+```{r}
+timeseries <-
+  #Defines parallel evaluation
+  mapInParallel(
+    # export model to workers
+    .export = "model_string",
+    # prepare worker for the task
+    .prep = quote({
+      library(CoRC)
+      loadModelFromString(model_string)
+    }),
+    #iteration data (1000 random seeds)
+    1:1000,
+    # iteration function using the seed values
+    function(seed) runTimeCourse(method = list(random_seed = seed ))$result
+  )
+```
+
+Now, we will reshape our data to plot it later on:
+`timeseries` is a list of 1000 tibbles with each tibble being time course. 
+
+```{r}
+plotdata <-
+  timeseries %>%
+  bind_rows() %>%
+  group_by(Time) %>%
+  # calculate mean and sd for all time points
+  summarise(across(everything(), list(mean = base::mean, sd = stats::sd)), .groups = "drop") %>%
+  # gather all values so the column `name` identifies "a_mean", "b_sd" etc.
+  pivot_longer(-Time) %>%
+  # split up information on species (a, b, c) and type of value (mean, sd)
+  separate(name, c("species", "type"), "_") %>%
+  pivot_wider(names_from = type, values_from = value)
+
+plotdata
+```
+
+Now, we will plot the data:
+
+```{r, message = FALSE}
+plot <-
+  ggplot(data = plotdata, aes(x = Time, y = mean, group = species, tt_sd = sd)) +
+  geom_ribbon(aes(ymin = mean - sd, ymax = mean + sd, fill = species), alpha = 1 / 4) +
+  geom_line(aes(color = species)) +
+  guides(fill = "none") +
+  labs(
+    x = paste0("Time (", getTimeUnit(), ")"),
+    y = paste0("Concentration (", getQuantityUnit(), ")"),
+    color = "Species"
+  )
+
+plotly::ggplotly(plot, tooltip = c("group", "x", "y", "tt_sd"))
+```
+
+To free some space, we can unload the model:
+
+```{r}
+unloadModel()
+```
+
+# 2D Sampling Random Initial Concentrations of Two Species
+
+Similarly we will now sample random initial concentrations of two species.
+This implements an example from the [Mendes 2009 book chapter](https://doi.org/10.1007/978-1-59745-525-1_2) [^2] on COPASI use cases. 
+
+We will load the model, set the steady state settings, and save our model as a string to load it in parallel later.
+
+```{r}
+loadSBML(biomodels_url(id = 68, version = 2, format = "sbml"))
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamiCoRC/main/models/BIOMD0000000068_url.xml")
+
+setSteadyStateSettings(calculate_jacobian = FALSE, perform_stability_analysis = FALSE)
+
+model_string <- saveModelToString()
+```
+
+This time, we will run 1000 stady-state calculations with random concentrations of two species (cysteine and adomed). 
+
+We will export the model to the workers, load CoRC and the model.
+Then we will assign random concentrations and run a steady state calculation:
+
+```{r}
+scan <-
+  # Defines parallel evaluation:
+  mapInParallel(
+    # export the model to the workers
+    .export = "model_string",
+    # prepare worker for the task
+    .prep = quote({
+      library(CoRC)
+      loadModelFromString(model_string)
+    }),
+    # iteration data (1000 random seeds)
+    1:1000,
+    # iteration function using the seed values
+    function(seed) {
+      set.seed(seed)
+      cysteine <- 0.3 * 10 ^ runif(1L, min = 0, max = 3)
+      adomed <- runif(1L, min = 0, max = 100)
+      setSpecies(
+        key = c("Cysteine", "adenosyl"),
+        initial_concentration = c(cysteine, adomed)
+      )
+      ss <- runSteadyState()
+      stopifnot(ss$result == "found")
+      list(
+        cysteine = cysteine,
+        adomed = adomed,
+        CGS = ss$reactions$flux[2],
+        TS = ss$reactions$flux[3]
+      )
+    }
+  )
+```
+
+Now we can reshape and plot the data:
+
+```{r, message = FALSE}
+plotdata <-
+  scan %>%
+  bind_rows() %>%
+  pivot_longer(c(CGS, TS), names_to = "reaction", values_to = "flux")
+
+plot <-
+  ggplot(data = plotdata, aes(x = adomed, y = flux, group = reaction, tt_cys = cysteine)) +
+  geom_point(aes(color = reaction), alpha = 1 / 10, size = 3 / 4) +
+  labs(
+    x = paste0("Adomed (", getQuantityUnit(), ")"),
+    y = paste0("Flux (", getQuantityUnit(), " / ", getTimeUnit(), ")"),
+    color = "Species"
+  )
+
+plotly::ggplotly(plot, tooltip = c("tt_cys", "x", "y"))
+```
+
+At the end we can again unload the model to free up memory.
+
+```{r}
+unloadModel()
+```
+
+## References
+[^1]: Kent, Edward, Stefan Hoops, and Pedro Mendes. "Condor-COPASI: high-throughput computing for biochemical networks." BMC systems biology 6.1 (2012): 91.
+[^2]: Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. https://doi.org/10.1007/978-1-59745-525-1_2

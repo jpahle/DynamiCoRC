@@ -1,0 +1,40 @@
+name: "Dynamic Publication Media with CoRC"
+navbar:
+  title: "Dynamic Publication Media with CoRC"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About CoRC"
+      href: corc.html
+    - text: "Documentation"
+      menu:
+        - text: "Beginners:"
+        - text: "Optimisation"
+          href: optimisation.html
+        - text: "Advanced:"
+        - text: "Parallel Processing with CoRC"
+          href: parallel.html
+    - text: "Teaching"
+      menu:
+        - text: "Michaelis-Menten Kinetics"
+          href: michaelismenten.html
+        - text: "Parameter Estimation"
+          href: parameterestimation.html
+        - text: "Oscillations"
+          href: oscillations.html
+    - text: "Science Communication"
+      menu:
+        - text: "Infection Dynamics"
+          href: infectiondynamics.html
+  right:
+    - text: "CoRC"
+      href: https://jpahle.github.io/CoRC/
+    - text: "Source Code"
+      icon: fa-github
+      href: https://github.com/jpahle/DynamiCoRC
+output_dir: "docs"
+exclude: ["data", "models", "models", "shinyapps", "oscillations.ipynb"]
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate

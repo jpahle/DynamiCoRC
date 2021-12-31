@@ -1,0 +1,289 @@
+---
+title: Parameter Estimation
+author: Johanna Daas, Jonas Förster and Jürgen Pahle
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.asp = 10/16,
+  out.width = "100%",
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+set.seed(1)
+```
+
+```{r, message = FALSE, include = FALSE}
+library(CoRC)
+library(tidyverse)
+```
+
+# Introduction
+
+In this workflow we will show you an implementation of a parameter estimation on the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
+
+[**Click here**](https://jpahle.shinyapps.io/parameterestimation/) to go to the interactive implementation of this document as a Shiny website which is hosted on the free service of shinyapps.io!
+
+You can see a *Timecourse* of the species of the model below.
+The points are measurements of two of the species in the model.
+
+```{r, echo = FALSE}
+data <- read_tsv("data/MAPKdata1.txt", col_types = cols())
+loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamiCoRC/main/models/BIOMD0000000010_url.xml")
+
+data_print <- data %>% pivot_longer(-Time, names_to = "names", values_to = "values")
+      
+tc_print <- runTC(duration = 1000, dt = 1)$result %>%
+  pivot_longer(-Time, names_to = "names", values_to = "values")
+      
+ggplot()+
+  geom_point(data = data_print, aes(x = Time, y = values, color = names))+
+  geom_line(data = tc_print, aes(x = Time, y = values, color = names))
+```
+
+As you can see, the model does not describe the data perfectly.
+We will try and get a better result by changing the parameters of our model.
+
+# Parameter estimation
+
+We want to find the parameters of our model that describe the data best.
+We call this *Parameter Estimation*.
+We have 22 parameters in our model, so finding the right combination of parameters by chance and just trying out is nearly impossible.
+Even only using a limited subset of these parameters (as we will do) will not work that way.
+We will use *algorithms* for that.
+
+Parameter estimation is an important topic when handling a model. In **CoRC** you have to 
+
+  1. Build or load a model
+  2. Define an experiment (with data to be fitted)
+  3. Define parameters that will be fitted
+  4. Run Parameter Estimation
+  
+We will go through these steps individually and explain what needs to be done as well as show visually how parameter estimation improves your fit.
+
+# Setup:
+
+First, we have to load the required packages.
+Please make sure, you have [**CoRC**](https://jpahle.github.io/CoRC/index.html) as well as [**ggplot2**](https://ggplot2.tidyverse.org/) installed before calling the library function.
+
+```{r}
+library(CoRC)
+library(ggplot2)
+```
+
+## 1. Load a model
+
+As stated above, to make a parameter estimation, you have to have a model to work on.
+If you want to know how to build you own model, you can [klick here](https://jpahle.github.io/CoRC/articles/model_building.html).
+
+In this workflow, we will instead load a SMBL-model. This model is from Kholodenko (2000)[^2]
+
+```{r}
+loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
+# loadSBML("https://raw.githubusercontent.com/jpahle/DynamiCoRC/main/models/BIOMD0000000010_url.xml")
+```
+
+We can inspect the species of the model like this:
+
+```{r}
+getSpecies()
+```
+
+This works in a similar way for reactions (`getReactions()`) and parameters (`getParameters()`)
+
+If you have **COPASI** installed, you can also have a look at the model there:
+
+```{r, eval=FALSE}
+openCopasi()
+```
+
+## 2. Define an Experiment
+
+Defining an experiment in **CoRC** means telling the program which data to fit and what the data actually describes.
+
+So we first need data.
+It is always a good idea to take a look at your data before working with it.
+This way you can make sure nothing unexpected is happening.
+
+```{r}
+data <- read_tsv("data/MAPKdata1.txt", col_types = cols())
+
+data
+```
+
+Then you have to define the experiment for COPASI.
+You need the data, as well as the type and mappings for the species.
+You can choose a weight method for your data (which prevents parameters getting fitted more closely just because they have higher values). 
+
+Your data colums in your data file can be of type "time", "dependent" and "independent", and if you want to exclude a column you can choose "ignore".
+
+The mapping argument in the function maps the data columns with the species in your model.
+In our case, the provided data is time course data, and our values are "transient concentrations".
+They are denoted like this: {[Species]}. You can find these notation by using the function `getSpeciesReferences()`.
+
+Time needs to be mapped with `NA`.
+
+Allowed weight methods are `"mean"`, `"mean_square"`, `"sd"`, and `"value_scaling"`. 
+
+```{r}
+fit_experiments <- defineExperiments(
+  data = data,
+  type = c("time", "dependent", "dependent"),
+  mapping = c(NA, "{[Mos-P]}", "{[Erk2-P]}"),
+  weight_method = "mean_square"
+)
+```
+
+## 3. Define Parameters
+
+We now have to define parameters that will be fitted. 
+
+First, let us take a look at all the parameters in the model:
+
+```{r}
+getParameters()
+```
+
+Now, we only want to fit the reaction rates (parameters with V).
+To make our fit parameters we need to make a list of lists with the attributes of the different parameter-estimation settings.
+To *define* a parameter for Parameter Estimation, we use the `defineParameterEstimationParameter()` function.
+
+
+```{r}
+fit_parameters <- list(
+  defineParameterEstimationParameter(
+    ref = "{(MAPKKK activation).V1}",
+    start_value = getParameters("(MAPKKK activation).V1")$value,
+    lower_bound = getParameters("(MAPKKK activation).V1")$value * 0.1,
+    upper_bound = getParameters("(MAPKKK activation).V1")$value * 1.9
+    ),
+  defineParameterEstimationParameter(
+    ref = "{(MAPKKK inactivation).V2}",
+    start_value = getParameters("(MAPKKK inactivation).V2")$value,
+    lower_bound = getParameters("(MAPKKK inactivation).V2")$value * 0.1,
+    upper_bound = getParameters("(MAPKKK inactivation).V2")$value * 1.9
+    ),
+  defineParameterEstimationParameter(
+    ref = "{(dephosphorylation of MAPKK-PP).V5}",
+    start_value = getParameters("(dephosphorylation of MAPKK-PP).V5")$value,
+    lower_bound = getParameters("(dephosphorylation of MAPKK-PP).V5")$value * 0.1,
+    upper_bound = getParameters("(dephosphorylation of MAPKK-PP).V5")$value * 1.9 
+    ),
+  defineParameterEstimationParameter(
+    ref = "{(dephosphorylation of MAPKK-P).V6}",
+    start_value = getParameters("(dephosphorylation of MAPKK-P).V6")$value,
+    lower_bound = getParameters("(dephosphorylation of MAPKK-P).V6")$value * 0.1,
+    upper_bound = getParameters("(dephosphorylation of MAPKK-P).V6")$value * 1.9
+    ),
+  defineParameterEstimationParameter(
+    ref = "{(dephosphorylation of MAPK-PP).V9}",
+    start_value = getParameters("(dephosphorylation of MAPK-PP).V9")$value,
+    lower_bound = getParameters("(dephosphorylation of MAPK-PP).V9")$value * 0.1,
+    upper_bound = getParameters("(dephosphorylation of MAPK-PP).V9")$value * 1.9
+    ),
+  defineParameterEstimationParameter(
+    ref = "{(dephosphorylation of MAPK-P).V10}",
+    start_value = getParameters("(dephosphorylation of MAPK-P).V10")$value,
+    lower_bound = getParameters("(dephosphorylation of MAPK-P).V10")$value * 0.1,
+    upper_bound = getParameters("(dephosphorylation of MAPK-P).V10")$value * 1.9
+  )
+)
+
+```
+
+## 4. Run parameter estimation
+
+To show how well our Parameter Estimation works, we want to print the model before and after parameter estimation.
+To do this, we have to *run* two Time Course evaluations, one with the parameters now, and one with the parameters after the Parameter Estimation.
+
+```{r}
+before <- runTimeCourse(duration = 1000, dt = 1)$result
+```
+
+After doing this, we will now actually run the Parameter Estimation.
+We need the parameters, experiments with our data that will be fitted, and specify the method.
+We want to use the Levenberg Marquardt method but other methods are available as well.
+You can find them using the function `getValidReactionFunctions()` with your function as an argument.
+
+Also, we specify that we want to update our model.
+This means, that all estimated parameters will be updated with the parameters of the best estimation.
+To compare the fit to the previous parameters we need to make sure we keep the previous fit.
+We already did that with our time course in the last chunk.
+
+```{r}
+result <-
+  runParameterEstimation(
+    parameters  = fit_parameters,
+    experiments = fit_experiments,
+    method = list(
+      method = "LevenbergMarquardt",
+      log_verbosity = 2
+    ),
+    update_model = TRUE
+  )
+```
+
+You can have a nicely readable version of the result by using the function `str(result)`.
+For space-reasons we will only take a look at the fitted parameters, but feel free to take a look at anything you find interesting. 
+
+```{r}
+result$parameters
+```
+
+## 5. Visualize results
+
+Now we have estimated and updated the parameters of our current model.
+To compare our old model parameters to our new, we run another time course.
+
+```{r}
+after <- runTimeCourse(duration = 1000, dt = 1)$result
+```
+
+We will use ggplot for visualizing our results.
+If you have never worked with ggplot, this way to define a plot will look unusual to you. 
+
+We first want to plot our experimental data, as well as two time courses (before and after) for *Erk2-P* and *Mos-P*. 
+
+```{r}
+Erk2P <- 
+  ggplot(mapping = aes(x = Time, y = `Erk2-P`)) +
+  geom_point(data = data, aes(color = "experimental")) +
+  geom_line (data = before, aes(color = "before")) +
+  geom_line (data = after, aes(color = "after"))
+
+MosP <-
+  ggplot(mapping = aes(x = Time, y = `Mos-P`)) +
+  geom_point(data = data, aes(color = "experimental")) +
+  geom_line (data = before, aes(color = "before")) +
+  geom_line (data = after, aes(color = "after"))
+```
+
+At the end, our result for Erk2-P
+
+```{r}
+Erk2P
+```
+
+as well as our result for Mos-P
+
+```{r}
+MosP
+```
+
+show, how well the Parameter Estimation was able to fit our model to the data.
+
+At the end, we can *unload* our model, to free some memory. 
+
+```{r}
+unloadModel()
+```
+
+## References
+[^1]: Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. https://doi.org/10.1007/978-1-59745-525-1_2
+[^2]: Kholodenko BN. Negative feedback and ultrasensitivity can bring about oscillations in the mitogen-activated protein kinase cascades. Eur J Biochem. 2000 Mar;267(6):1583-8. doi: 10.1046/j.1432-1327.2000.01197.x. PMID: 10712587.

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Johanna Daas, Jonas Förster and Jürgen Pahle" />
+
+
+<title>Optimisation</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Dynamic Publication Media with CoRC</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="corc.html">About CoRC</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Documentation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Beginners:</li>
+    <li>
+      <a href="optimisation.html">Optimisation</a>
+    </li>
+    <li class="dropdown-header">Advanced:</li>
+    <li>
+      <a href="parallel.html">Parallel Processing with CoRC</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Teaching
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="michaelismenten.html">Michaelis-Menten Kinetics</a>
+    </li>
+    <li>
+      <a href="parameterestimation.html">Parameter Estimation</a>
+    </li>
+    <li>
+      <a href="oscillations.html">Oscillations</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Science Communication
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="infectiondynamics.html">Infection Dynamics</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://jpahle.github.io/CoRC/">CoRC</a>
+</li>
+<li>
+  <a href="https://github.com/jpahle/DynamiCoRC">
+    <span class="fa fa-github"></span>
+     
+    Source Code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Optimisation</h1>
+<h4 class="author">Johanna Daas, Jonas Förster and Jürgen Pahle</h4>
+
+</div>
+
+
+<p>This document follows closely the <a href="https://doi.org/10.1007/978-1-59745-525-1_2">Mendes 2009 paper</a><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> on <strong>COPASI</strong> use cases.</p>
+<p>If we want to optimise something, we either want to <em>minimize</em> or <em>maximize</em> a specific task value.</p>
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<p>First, we have to load <strong>CoRC</strong> and <strong>tidyverse</strong>. Make sure you have these packages downloaded. If you have not yet downloaded CoRC, take a look at the tab <strong>Download</strong></p>
+</div>
+<div id="section" class="section level1 tabset">
+<h1 class="tabset"></h1>
+<div id="code" class="section level2">
+<h2>Code</h2>
+<pre class="r"><code>library(CoRC)
+library(tidyverse)</code></pre>
+</div>
+<div id="download" class="section level2">
+<h2>Download</h2>
+<pre class="r"><code># install tidyverse
+install.packages(&quot;tidyverse&quot;)
+
+# install CoRC from GitHub
+install.packages(&quot;remotes&quot;)
+remotes::install_github(&quot;jpahle/CoRC&quot;)</code></pre>
+</div>
+</div>
+<div id="section-1" class="section level1 unnumbered">
+<h1 class="unnumbered"></h1>
+</div>
+<div id="loading-the-model" class="section level1">
+<h1>Loading the model</h1>
+<p>We will work with model <a href="https://www.ebi.ac.uk/biomodels/BIOMD0000000023">Nr. 23 in BioModels</a><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001). The model can be loaded directly from the biomodels database; in case this does not work it is also stored in this repository (see commented out line).</p>
+<pre class="r"><code>loadSBML(biomodels_url(id = 23, format = &quot;sbml&quot;))
+#&gt; # A COPASI model reference:
+#&gt; Model name: &quot;Rohwer2001_Sucrose&quot;
+#&gt; Number of compartments: 1
+#&gt; Number of species: 13
+#&gt; Number of reactions: 11
+
+# if that does not work, try:
+# loadSBML(&quot;https://raw.githubusercontent.com/jpahle/DynamiCoRC/main/models/BIOMD0000000023_url.xml&quot;)</code></pre>
+<p>CoRC will give out general specifications about the model upon loading. To get a better understanding of the model, we will first take a look at the reactions:</p>
+<pre class="r"><code>getReactions()
+#&gt; # A tibble: 11 x 6
+#&gt;    key   name  reaction                      rate_law           flux number_flux
+#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;                         &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt;
+#&gt;  1 (v1)  v1    Fruex = Fru                   FunctionDB.Funct~     0           0
+#&gt;  2 (v2)  v2    Glcex = Glc                   FunctionDB.Funct~     0           0
+#&gt;  3 (v3)  v3    ATP + Glc = HexP + ADP;  Fru  FunctionDB.Funct~     0           0
+#&gt;  4 (v4)  v4    Fru + ATP = HexP + ADP;  Glc  FunctionDB.Funct~     0           0
+#&gt;  5 (v5)  v5    Fru + ATP = HexP + ADP        FunctionDB.Funct~     0           0
+#&gt;  6 (v6)  v6    2 * HexP = UDP + Suc6P;  phos FunctionDB.Funct~     0           0
+#&gt;  7 (v7)  v7    Suc6P = Suc + phos            FunctionDB.Funct~     0           0
+#&gt;  8 (v8)  v8    HexP + Fru = Suc + UDP        FunctionDB.Funct~     0           0
+#&gt;  9 (v9)  v9    Suc = Fru + Glc               FunctionDB.Funct~     0           0
+#&gt; 10 (v10) v10   HexP = glycolysis             FunctionDB.Funct~     0           0
+#&gt; 11 (v11) v11   Suc = Sucvac                  FunctionDB.Funct~     0           0</code></pre>
+<p>Of interest to us are reactions <em>v11</em> (accumulation of sucrose in vacuoles) and <em>v9</em> (hydrolysis of sucrose), which decreases our overall productivity.</p>
+<p>We can the behavior of the species in the plot below. The component we are interested in is Sucrose (Suc).</p>
+</div>
+<div id="section-2" class="section level1 tabset">
+<h1 class="tabset"></h1>
+<div id="plot" class="section level2">
+<h2>Plot</h2>
+<p><img src="optimisation_files/figure-html/unnamed-chunk-6-1.png" width="100%" /></p>
+</div>
+<div id="code-1" class="section level2">
+<h2>Code</h2>
+<pre class="r"><code>tc1 &lt;- runTC(duration = 1000, dt = 1)$result %&gt;% 
+  pivot_longer(-Time, names_to = &quot;names&quot;, values_to = &quot;values&quot;)
+ggplot(data = tc1) +
+  geom_line(aes(x = Time, y = values, color = names))</code></pre>
+</div>
+</div>
+<div id="section-3" class="section level1 unnumbered">
+<h1 class="unnumbered"></h1>
+</div>
+<div id="the-objective-function" class="section level1">
+<h1>The objective function</h1>
+<p>We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis. <span class="math inline">\(J_{v11}/J_{v9}\)</span>. For our optimisation algorithms it is necessary to define our optimisation goal as a <strong>minimum</strong>: we want to minimize <span class="math inline">\(J_{v9}/J_{v11}\)</span></p>
+<p>What we just defined is called an <em>objective function</em>.</p>
+<p>In <strong>CoRC</strong> we can define the objective function like this:</p>
+</div>
+<div id="section-4" class="section level1 tabset">
+<h1 class="tabset"></h1>
+<div id="code-2" class="section level2">
+<h2>Code</h2>
+<pre class="r"><code>objf &lt;- &quot;{(v9).Flux}/{(v11).Flux}&quot;</code></pre>
+</div>
+<div id="advanced-code" class="section level2">
+<h2>Advanced Code</h2>
+<pre class="r"><code>objf &lt;- paste0(reaction(&quot;(v9)&quot;, reference = &quot;Flux&quot;), &quot;/&quot;, reaction(&quot;(v11)&quot;, reference = &quot;Flux&quot;))
+objf
+#&gt; [1] &quot;{(v9).Flux}/{(v11).Flux}&quot;</code></pre>
+</div>
+</div>
+<div id="section-5" class="section level1 unnumbered">
+<h1 class="unnumbered"></h1>
+</div>
+<div id="the-parameters" class="section level1">
+<h1>The parameters</h1>
+<p>Now we have to think about, what we are able to change to reach the minimum possible value for our objective function. We can assume for this teaching example that we are able to manipulate the steady state levels of our enzymes in reactions <em>v1</em>, <em>v2</em>, <em>v3</em>, <em>v4</em> and <em>v5</em>.</p>
+<p>We have to define our optimisation parameters in <strong>CoRC</strong>. It is possible to specify several aspects of our parameters, e.g. give them a specific starting value or bounds on how far the estimation is allowed to search. We will say that we can downregulate an enzyme by 50% or overexpress it by 400%. The start values are going to be the current values in our model.</p>
+</div>
+<div id="section-6" class="section level1 tabset">
+<h1 class="tabset"></h1>
+<div id="code-3" class="section level2">
+<h2>Code</h2>
+<pre class="r"><code>parameters &lt;- list(
+  defineOptimizationParameter(ref = &quot;{(v1).Vmax1}&quot;,
+                              start_value = getParameters(&quot;(v1).Vmax1&quot;)$value,
+                              lower_bound = 0.5 * getParameters(&quot;(v1).Vmax1&quot;)$value,
+                              upper_bound = 4 * getParameters(&quot;(v1).Vmax1&quot;)$value),
+  defineOptimizationParameter(&quot;{(v2).Vmax2}&quot;,
+                              start_value = getParameters(&quot;(v2).Vmax2&quot;)$value,
+                              lower_bound = 0.5 * getParameters(&quot;(v2).Vmax2&quot;)$value,
+                              upper_bound = 4 * getParameters(&quot;(v2).Vmax2&quot;)$value),
+  defineOptimizationParameter(&quot;{(v3).Vmax3}&quot;,
+                              start_value = getParameters(&quot;(v3).Vmax3&quot;)$value,
+                              lower_bound = 0.5 * getParameters(&quot;(v3).Vmax3&quot;)$value,
+                              upper_bound = 4 * getParameters(&quot;(v3).Vmax3&quot;)$value),
+  defineOptimizationParameter(&quot;{(v4).Vmax4}&quot;,
+                              start_value = getParameters(&quot;(v4).Vmax4&quot;)$value,
+                              lower_bound = 0.5 * getParameters(&quot;(v4).Vmax4&quot;)$value,
+                              upper_bound = 4 * getParameters(&quot;(v4).Vmax4&quot;)$value),
+  defineOptimizationParameter(&quot;{(v5).Vmax5}&quot;,
+                              start_value = getParameters(&quot;(v5).Vmax5&quot;)$value,
+                              lower_bound = 0.5 * getParameters(&quot;(v5).Vmax5&quot;)$value,
+                              upper_bound = 4 * getParameters(&quot;(v5).Vmax5&quot;)$value)
+  )</code></pre>
+</div>
+<div id="advanced-code-1" class="section level2">
+<h2>Advanced Code</h2>
+<pre class="r"><code>make_opt_param &lt;- function(name) {
+  value_ref &lt;- parameter_strict(name, reference = &quot;Value&quot;)
+  value &lt;- getValue(value_ref)
+  defineOptimizationParameter(ref = value_ref,
+                              start_value = value,
+                              lower_bound = 0.5 * value,
+                              upper_bound = 4 * value)
+}
+
+parameters &lt;- lapply(c(&quot;(v1).Vmax1&quot;, &quot;(v2).Vmax2&quot;, &quot;(v3).Vmax3&quot;, &quot;(v4).Vmax4&quot;, &quot;(v5).Vmax5&quot;), make_opt_param)</code></pre>
+</div>
+</div>
+<div id="section-7" class="section level1 unnumbered">
+<h1 class="unnumbered"></h1>
+</div>
+<div id="optimisation-method" class="section level1">
+<h1>Optimisation method</h1>
+<p>Now we have to choose which optimisation method we will use for optimisation. For our first try we will use <em>Truncated Newton</em>. There are a lot of different methods available in <strong>CoRC</strong> which you can find in the documentation of the <code>runOptimization()</code> function.</p>
+<pre class="r"><code>method &lt;- &#39;TruncatedNewton&#39;</code></pre>
+<p>Bear in mind, that there is no such thing as “the perfect” or “the right” optimisation method. It is always advisable to try out several (global and local) algorithms.</p>
+</div>
+<div id="optimisation" class="section level1">
+<h1>Optimisation</h1>
+<p>Now we have all elements we need for our optimisation routine. We still need to specify a few arguments in our function:</p>
+<ul>
+<li>subtask: As the subtask we define <code>steadyState</code>, as our optimisation optimises fluxes in the steady state</li>
+<li>randomize_start_values: We just took the time specifying where our start values are so we don’t want to randomize them all again. If we think we always find a local minimum instead of a global one, it might be helpful to randomize the start values.</li>
+<li>update_model: We will save our current parameter values, so we can update the model in this function and not lose them.</li>
+</ul>
+<pre class="r"><code>par_before &lt;- getParameters()$value
+
+result &lt;- runOptimization(expression = objf,
+                subtask = &#39;steadyState&#39;,
+                randomize_start_values = FALSE,
+                update_model = TRUE,
+                parameters = parameters,
+                method = method)
+result$main$objective_value
+#&gt; [1] 0.07816841
+result$parameters
+#&gt; # A tibble: 5 x 6
+#&gt;   parameter  lower_bound start_value  value upper_bound gradient
+#&gt;   &lt;chr&gt;            &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+#&gt; 1 (v1).Vmax1      0.143       0.339  0.339        1.14  -0.254  
+#&gt; 2 (v2).Vmax2      0.143       0.342  0.342        1.14  -0.225  
+#&gt; 3 (v3).Vmax3      0.0985      0.0985 0.0985       0.788  1.21   
+#&gt; 4 (v4).Vmax4      0.0985      0.196  0.196        0.788  0.00801
+#&gt; 5 (v5).Vmax5      0.082       0.134  0.134        0.656  0.185</code></pre>
+<p>Our new model with the updated parameter values looks like this:</p>
+</div>
+<div id="section-8" class="section level1 tabset">
+<h1 class="tabset"></h1>
+<div id="plot-1" class="section level2">
+<h2>Plot</h2>
+<p><img src="optimisation_files/figure-html/unnamed-chunk-14-1.png" width="100%" /></p>
+</div>
+<div id="code-4" class="section level2">
+<h2>Code</h2>
+<pre class="r"><code>tc &lt;- runTC(duration = 1000, dt = 1)$result %&gt;% 
+  pivot_longer(-Time, names_to = &quot;names&quot;, values_to = &quot;values&quot;)
+ggplot()+
+  geom_line(data = tc1, linetype = &quot;dashed&quot;, aes(x = Time, y = values, color = names))+
+  geom_line(data = tc, aes(x = Time, y = values, color = names))</code></pre>
+</div>
+</div>
+<div id="section-9" class="section level1 unnumbered">
+<h1 class="unnumbered"></h1>
+<p>The dashed lines were from the timecourse before the optimisation, so we can see that our optimisation routine worked very well!</p>
+<div id="references" class="section level2">
+<h2>References</h2>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. <a href="https://doi.org/10.1007/978-1-59745-525-1_2" class="uri">https://doi.org/10.1007/978-1-59745-525-1_2</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Rohwer, Johann M., and Frederik C. Botha. “Analysis of sucrose accumulation in the sugar cane culm on the basis of in vitro kinetic data.” Biochemical Journal 358.2 (2001): 437-445.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

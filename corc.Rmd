@@ -1,0 +1,26 @@
+---
+title: CoRC
+---
+
+This publication uses **CoRC** for its documents.
+
+CoRC is a binding of [COPASI](http://copasi.org/) to R and provides a high-level scripting interface for complex, reproducible workflows.
+The model building, handling and analyzing of COPASI is translated into intuitive scripting functions, allowing both people well versed in the GUI interface of COPASI as well as newcomers to understand the workflows.
+Converting a gui-based interface into a scripting interface easily allows not only to share reproducible models (which is already possible using COPASI), but also whole workflows.
+
+On these pages, you will find workflows both to show use-cases for the packages as well as some help for new users.
+
+If you want to start with coding right away, you can use our beginner friendly document on [opimization](https://jpahle.github.io/DynamiCoRC/optimization.html).
+If you are already familiar with COPASI and model building and want to see what CoRC can do, look at our example on [Parallel Processing](https://jpahle.github.io/DynamiCoRC/parallel.html).
+
+If you want to have a more friendly learning curve, try out our teaching documents!
+
+Click here to find out more about [**CoRC**](https://jpahle.github.io/CoRC/). 
+
+## Download
+
+```{r, eval=FALSE}
+# install CoRC from GitHub
+install.packages("remotes")
+remotes::install_github("jpahle/CoRC")
+```
