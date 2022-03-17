@@ -248,8 +248,9 @@ To make a model, we need to make **assumptions** about who interacts with each o
 For our first infection model (called SIR-Model), we assume:
 
 **The actors**
-In a model, parts that can interact with each other are called *species*.
-For the first model, we assume, that there are three species.
+In a model, parts that can interact with each others (the actors) are called *species*.
+This can be everything, depending on your model, from proteins to individuums to actual biological species.
+For the first model, we assume that there are three *species*, and in our case these are groups of individuals.
 Infected individuals ($I$), individuals that can get infected (called susceptibles, $S$) and individuals that were infected and cannot be infected anymore (called recovered / removed, $R$).
 We also assume in what quantities these species are at the begin of our simulation.
 We say, that there is only one infected and no recovered among a population of 1000 (this is an arbitrary number) susceptibles.
@@ -296,11 +297,12 @@ Our (mathematical) model looks like this:
 $$ S + I \xrightarrow{infection} 2* I$$
 $$ I \xrightarrow{recovery} R $$
 
-If a suseptible individual interacts with an infected individual, they are now **both** infected.
+If a susceptible individual interacts with an infected individual, they are now **both** infected.
 This process is called *infection*.
 An infected individual can *recover*.
-We can controll two parameters here.
+We can control two parameters here.
 One for the speed of infection and one for the speed of recovery.
+How do you think these parameters affect the model? 
 Try it out yourself, by moving the sliders on the right.
 
 ```{r}
@@ -382,6 +384,8 @@ $$ S + I \xrightarrow{infection} I $$
 $$ I \xrightarrow{recovery} R $$
 $$ I \xrightarrow{death} D $$
 $$ S \xrightarrow{vaccination} R $$
+
+How do you think will vaccination affect our population? Think about it and try it out with the sliders.
 
 Models and Data
 ======
