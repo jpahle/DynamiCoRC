@@ -454,7 +454,7 @@ runTC(duration = 1000)$result_number %>%
 
 # Parameters of the model: {.tabset .tabset-pills}
 
-We have to do something siilar for our parameters to achieve the correct behaviour.
+We have to do something similar for our parameters to achieve the correct behaviour.
 
 ## Code
 
@@ -569,9 +569,7 @@ We can try and explain how our model oscillates by going through those point by 
 1. We have negative feedback - the more mice we create the more mice will be eaten by cats.
 2. The production of more cats following the production of lots of mice takes some time. This is why we do not get a steady state.  
 3. The cats and mice interact in the 4th reaction (Cats + Mice -> 2 * Cats) which creates a non-linearity in the system.
-4. They are in appropriate time scales.
-
-If our production of new cats would take years, whereas the population of mice would take days the populations wouldn't sufficiently affect each other.
+4. They are in appropriate time scales: If our production of new cats would take years, whereas the population of mice would take days the populations wouldn't sufficiently affect each other.
 
 # Phase space diagram
 
