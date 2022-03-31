@@ -70,7 +70,7 @@ where the substrate and the enzyme reversibly form a complex $SE$ (with paramete
 
 In this model, all our reaction follow *Mass-action kinetics* where the reaction rate is proportional to the concentration of the substrates.
 
-We can denote our reaction rates for the two reaction as following:
+We can denote our reaction rates for the two reactions as follows:
 
 1.) $k_f*([S]+[E]) - k_r*[SE]$
 
@@ -286,7 +286,7 @@ As you can see, the dotted (for manual) and the normal line vary slightly, but t
 # Non-Michaelis-Menten Kinetics
 
 We have seen, that the Michaelis-Menten Kinetics do not apply to every reaction in every model.
-From the assumptions that are in the Michaelis-Menten Kinetics, we can see which reactions cannot be approximated well with these kinetics.
+From the assumptions that are in the Michaelis-Menten Kinetics, we can see which reactions **cannot** be approximated well with these kinetics:
 
 (@) The Reaction is not catalyzed by an enzyme. 
 This seems straightforward, but it is something to keep in mind.
