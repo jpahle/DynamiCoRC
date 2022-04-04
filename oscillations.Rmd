@@ -20,7 +20,7 @@ set.seed(1)
 
 # Google Colab
 
-If you want to work on this worksheet yourself, try it out on [**Google Colab**](https://colab.research.google.com/drive/12Muep3b4GHhkJmCoIRF-RaF5HhcD2JJy).
+If you want to work on this worksheet yourself, try it out on [**Google Colab**](https://lab.pahle.org/DynamiCoRC/oscillatorydynamics).
 
 # Introduction
 

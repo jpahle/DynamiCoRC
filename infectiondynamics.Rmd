@@ -6,7 +6,7 @@ output: html_document
 
 # Infection Dynamics
 
-[**Click here**](https://jpahle.shinyapps.io/infectiondynamics/) to go to our interactive Shiny website on infection dynamics which is hosted on the free service of shinyapps.io!
+[**Click here**](https://lab.pahle.org/DynamiCoRC/infectiondynamics) to go to our interactive Shiny website on infection dynamics which is hosted on the free service of shinyapps.io!
 
 ## Why Infection Dynamics
 

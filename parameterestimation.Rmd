@@ -27,7 +27,7 @@ library(tidyverse)
 
 In this workflow we will show you an implementation of a parameter estimation on the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
 
-[**Click here**](https://jpahle.shinyapps.io/parameterestimation/) to go to the interactive implementation of this document as a Shiny website which is hosted on the free service of shinyapps.io!
+[**Click here**](https://lab.pahle.org/DynamiCoRC/parameterestimation) to go to the interactive implementation of this document as a Shiny website which is hosted on the free service of shinyapps.io!
 
 You can see a *Timecourse* of the species of the model below.
 The points are measurements of two of the species in the model.
