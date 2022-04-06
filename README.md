@@ -4,7 +4,22 @@ Dynamically published documents (instead of static ones like books and papers) o
 You can interact with them, or they are created dynamically, with code.
 
 We wanted to focus on three different main applications for these documents: **Documentation**, **Teaching** and **Science Communication**.
-The documents provided for this paper are found on this page.
+With this repository, we publish a selection of documents covering these topics:
+
+- Optimisation  
+  [[HTML page](https://jpahle.github.io/DynamiCoRC/optimisation)] [[Source code](optimisation.Rmd)]
+- Parallel Processing  
+  [[HTML page](https://jpahle.github.io/DynamiCoRC/parallel)] [[Source code](parallel.Rmd)]
+- Michaelis-Menten Kinetics  
+  [[HTML page](https://jpahle.github.io/DynamiCoRC/michaelismenten)] [[Source code](michaelismenten.Rmd)]
+- Parameter Estimation  
+  [[HTML page](https://jpahle.github.io/DynamiCoRC/parameterestimation)] [[Source code](parameterestimation.Rmd)]  
+  [[Shiny app](https://lab.pahle.org/DynamiCoRC/parameterestimation)] [[Source code](shinyapps/parameterestimation/parameterestimation.Rmd)]
+- Oscillatory Dynamics  
+  [[HTML page](https://jpahle.github.io/DynamiCoRC/oscillations)] [[Source code](oscillations.Rmd)]  
+  [[Google Colab](https://lab.pahle.org/DynamiCoRC/oscillatorydynamics)] [[Source code](oscillations.ipynb)]
+- Infection Dynamics  
+  [[Shiny app](https://lab.pahle.org/DynamiCoRC/infectiondynamics)] [[Source code](shinyapps/infectiondynamics/infectiondynamics.Rmd)]
 
 # Dynamic Documents with CoRC
 
