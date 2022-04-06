@@ -25,7 +25,7 @@ There are a lot of hosting options for dynamic documents.
 Most of the files created and used here are hosted on [Github Pages](https://pages.github.com/).
 While very easy to use, all the websites hosted there are static.
 
-In addition, one document is hosted on [Google Colab](https://colab.google.com).
+In addition, one document is hosted on [Google Colab](https://colab.research.google.com).
 Here, it is possible to code online, within the document.
 
 The more dynamic R Markdown documents, like shiny apps and flexdashboards are hosted on [shinyapps.io](https://www.shinyapps.io/).
