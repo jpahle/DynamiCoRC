@@ -208,7 +208,7 @@ Then you have to define the experiment for COPASI.
 You need the data, as well as the type and mappings for the species.
 You can choose a weight method for your data (which prevents parameters getting fitted more closely just because they have higher values). 
 
-Your data colums in your data file can be of type "time", "dependent" and "independent", and if you want to exclude a column you can choose "ignore".
+Your data columns in your data file can be of type "time", "dependent" and "independent", and if you want to exclude a column you can choose "ignore".
 
 The mapping argument in the function maps the data columns with the species in your model.
 In our case, the provided data is time course data, and our values are "transient concentrations".
