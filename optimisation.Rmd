@@ -20,12 +20,12 @@ set.seed(1)
 
 This document follows closely the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
 
-If we want to optimise something, we either want to *minimize* or *maximize* a specific task value.
+If we want to optimise something, we either want to *minimise* or *maximise* a specific target value.
 
 # Setup
 
 First, we have to load **CoRC** and **tidyverse**.
-Make sure you have these packages downloaded. If you have not yet downloaded CoRC, take a look at the tab **Download**
+Make sure you have these packages downloaded. If you have not yet downloaded CoRC, take a look at the tab **Download**.
 
 # {.tabset}
 
@@ -52,7 +52,7 @@ remotes::install_github("jpahle/CoRC")
 # Loading the model
 
 We will work with model [Nr. 23 in BioModels](https://www.ebi.ac.uk/biomodels/BIOMD0000000023)[^2], which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001). 
-The model can be loaded directly from the biomodels database; in case this does not work it is also stored in this repository (see commented out line).
+The model can be loaded directly from the biomodels database; in case this does not work it is also stored in this repository (see commented-out line).
 
 ```{r}
 loadSBML(biomodels_url(id = 23, format = "sbml"))
@@ -69,7 +69,7 @@ getReactions()
 
 Of interest to us are reactions *v11* (accumulation of sucrose in vacuoles) and *v9* (hydrolysis of sucrose), which decreases our overall productivity.
 
-We can the behavior of the species in the plot below. The component we are interested in is Sucrose (Suc).
+We can see the behaviour of the species in the plot below. The component we are interested in is Sucrose (Suc).
 
 # {.tabset}
 
@@ -95,7 +95,7 @@ ggplot(data = tc1) +
 
 # The objective function
 
-We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis.
+We want to maximise our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis.
 $J_{v11}/J_{v9}$.
 For our optimisation algorithms it is necessary to define our optimisation goal as a **minimum**: we want to minimize $J_{v9}/J_{v11}$
 

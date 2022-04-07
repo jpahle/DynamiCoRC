@@ -177,7 +177,7 @@ getReactions()
 
 # {-}
 
-# Visualizing species {.tabset .tabset-pills}
+# Visualising species {.tabset .tabset-pills}
 
 We want to show how species *a* behaves over time.
 For this, we first have to run a time course.
@@ -190,7 +190,7 @@ timecourse
 
 ## Code
 
-Fill in the missing code to visualize species *a*!
+Fill in the missing code to visualise species *a*!
 
 ```{r, eval=FALSE}
 ggplot(data = ) +
@@ -199,7 +199,7 @@ ggplot(data = ) +
 
 ## Hint
 
-The visualization uses the package ggplot2.
+The visualisation uses the package ggplot2.
 If you are unfamiliar with that, you can look up some documentation about it on the [ggplot2 website](https://ggplot2.tidyverse.org/index.html).
 
 You have to think about what is missing here.
@@ -211,7 +211,7 @@ There are some equal signs that only have one side filled out.
 ## Solution
 
 `data` specifies the data frame ggplot draws its data from.
-We have created a timecourse table that we want to plot, so this is our `data`.
+We have created a time course table that we want to plot, so this is our `data`.
 
 `x` is the x-axis of our plot (the time) and `y` the y-axis (concentration of a).
 We find both in our data frame that we provided with `data`.
@@ -235,7 +235,7 @@ Now, can you do the same for *b* and *c*?
 
 ## Hint
 
-Take a look at the code for visualizing *a* and think about what is the same and what is different for *b* and *c*.
+Take a look at the code for visualising *a* and think about what is the same and what is different for *b* and *c*.
 
 ## Solution
 
@@ -250,9 +250,9 @@ ggplot(data = timecourse) +
 ```
 
 It is also nice to put all species in one plot.
-To see which species are which, we will also color the lines.
-We can tell ggplot implicitly to color *a* different than *b* by calling the color `"a"` and `"b"`.
-Of course you can also explicitly tell which color to use by saying `color = "red"` (after the `aes()` command) for example.
+To see which species are which, we will also colour the lines.
+We can tell ggplot implicitly to colour *a* different than *b* by calling the colour `"a"` and `"b"`.
+Of course you can also explicitly tell which colour to use by saying `color = "red"` (after the `aes()` command) for example.
 
 ```{r}
 ggplot(data = timecourse) +
@@ -267,13 +267,13 @@ ggplot(data = timecourse) +
 
 Now, the question presents itself: How and why does this model oscillate? And why does it matter? 
 
-To answer the last question first, oscillators are fascinating because a lot of fascinating signalling pathways in biology oscillate.
+To answer the last question first, oscillators are fascinating because a lot of (signalling and other) pathways in biology oscillate.
 You can think about why that might have some sort of evolutionary advantage.
 What is in our environment that changes over time in an oscillating way?
 
 The first thing that might come to mind is our day-and-night-cycle.
 And indeed, we find oscillating signalling pathways here.
-Even without external stimuli these oscillation prevail.
+Even without external stimuli these oscillations prevail.
 For example, one of biologists' favorite pet, the fruit fly *Drosophila melanogaster* has the proteins PER (short for *period*) and TIM (short for *timeless*) that act as their "clock" (Tyson, 1999)[^2].
 
 The fist question is a bit harder to answer.
@@ -508,13 +508,13 @@ Try making the plot yourself.
 ## Hint
 
 We already made a plot above.
-We need to run a timecourse to get our data for the plot and then use ggplot for plotting.
-This time, we also need colors; so take a look at the `color` argument of the ggplot `aes()` function, where we specified `x` and `y`.
+We need to run a time course to get our data for the plot and then use ggplot for plotting.
+This time, we also need colours; so take a look at the `color` argument of the ggplot `aes()` function, where we specified `x` and `y`.
 
 ## Solution
 
-First, we will run a timecourse.
-We set the duration of the timecourse to 1000 and the delta t low, so we get a smooth output.
+First, we will run a time course.
+We set the duration of the time course to 1000 and the delta t low, so we get a smooth output.
 
 ```{r}
 timecourse <- runTimeCourse(duration = 1000, dt = 0.1)
@@ -543,9 +543,9 @@ To get a better understanding what the `pivot_longer()` function does, you can t
 
 Now we have everything we need for ggplot.
 We call the `ggplot()` function.
-As data, we need our prepared timecourse, `timecourse_long`.
+As data, we need our prepared time course, `timecourse_long`.
 On the x-axis we want the time and on the y-axis we want the values (concentrations).
-To differentiate between our species, we also need color. 
+To differentiate between our species, we also need colour. 
 
 ```{r}
 ggplot(data = timecourse_long, aes(x = Time, y = Count, color = Species)) +
@@ -559,9 +559,9 @@ But why and how does our model oscillate?
 
 In a helpful review from Novák and Tyson [^5] we find the following requirements for oscillators:
 
-1. Negative feedback to carry a reaction network back to the 'starting point' of oscillation
-2. Negative feedback signal sufficiently delayed in time so we don't get a steady state
-3. Kinetic rate laws need to be nonlinear
+1. Negative feedback to carry a reaction network back to the 'starting point' of oscillation.
+2. Negative feedback signal sufficiently delayed in time so we don't get a steady state.
+3. Kinetic rate laws need to be nonlinear.
 4. Reactions that produce and consume interacting chemical species must occur on appropriate time scales.
 
 We can try and explain how our model oscillates by going through those point by point.
@@ -604,7 +604,7 @@ We want them normally distributed around the current value for each species with
 sample_values_df <- tibble(Cats = c(), Mice = c())
 ```
 
-Afterwards, we want to run a timecourse for each of the ten combinations in `sample_values_df`.
+Afterwards, we want to run a time course for each of the ten combinations in `sample_values_df`.
 
 ```{r, eval=FALSE}
 # run 10 time courses
@@ -620,8 +620,8 @@ And lastly, we want to plot everything.
 
 You can generate random numbers that are normally distributed using `rnorm`.
 
-You can use a for-loop to run your timecourses.
-Make sure you set your species to the new starting condition before each timecourse.
+You can use a for-loop to run your time courses.
+Make sure you set your species to the new starting condition before each time course.
 
 The plotting part should look similar to above.
 
@@ -650,7 +650,7 @@ sample_values_df
 We will run 10 time courses with different initial numbers for our species in a for-loop.
 
 The for loop runs for each row of the `sample_values_df` dataframe, specifying an initial condition.
-Each time, the new initial condition is applied, the timecourse is run and appended to a list collecting all timecourses.
+Each time, the new initial condition is applied, the time course is run and appended to a list collecting all time courses.
 The results are merged into a single dataframe `tc_df` with the column `sample` specifying the iteration.
 
 ```{r}
@@ -674,7 +674,7 @@ tc_df <-
   mutate(sample = as.integer(sample))
 ```
 
-The plotting works the similarly to before, but instead of `Time`, we want to color by our run counter (`sample`).
+The plotting works the similarly to before, but instead of `Time`, we want to colour by our run counter (`sample`).
 
 ```{r}
 ggplot(data = tc_df, aes(x = Mice, y = Cats, color = sample, group = sample)) +
@@ -732,7 +732,7 @@ While the oscillation behaviour is generally conserved, the random fluctuations 
 We will now take a look at another model.
 This model is about oscillations in calcium signalling [(Kummer, 2000)](https://www.ebi.ac.uk/biomodels/BIOMD0000000329) [^7].
 This model has three species: **G-alpha**, **activePLC** and **Calcium**.
-All three of these species can oscillate, so we can visualize this in a 3D-plot.
+All three of these species can oscillate, so we can visualise this in a 3D-plot.
 
 But first, we need to load our model and create a timeseries. We will use a duration of 24, which is 2 Periods with 10000 intervals.
 
@@ -750,20 +750,20 @@ You can take a look at this model using the `getSpecies()` and `getReactions()` 
 
 ## Code
 
-Run a timecourse that we can use for plotting.
+Run a time course that we can use for plotting.
 
 ```{r, eval=FALSE}
-# run a timecourse
+# run a time course
 
 ```
 
 ## Hint
 
-The timecourse needs two arguments, `duration` and `intervals`.
+The time course needs two arguments, `duration` and `intervals`.
 
 ## Solution
 
-The timecourse has two arguments: `duration` needs to be set to 24 and `intervals` to 10000.
+The time course has two arguments: `duration` needs to be set to 24 and `intervals` to 10000.
 
 ```{r}
 timecourse <- runTimeCourse(duration = 24, intervals = 10000)
@@ -771,7 +771,7 @@ timecourse <- runTimeCourse(duration = 24, intervals = 10000)
 
 # {-}
 
-## Vizualization
+## Visualisation
 
 We will use the **plotly** package to make a plot, because **ggplot2** does not support 3d graphics.
 With our plotly solution you can also interact with the plot in the browser.
@@ -795,7 +795,7 @@ If you want, you can investigate the behaviour of this model by plotting the thr
 
 # Stochastic solutions {.tabset .tabset-pills}
 
-But we can also run this timecourse stochastically!
+But we can also run this time course stochastically!
 For this, we need the `method` argument.
 
 ## Code

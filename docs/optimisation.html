@@ -324,11 +324,18 @@ $(document).ready(function () {
 </div>
 
 
-<p>This document follows closely the <a href="https://doi.org/10.1007/978-1-59745-525-1_2">Mendes 2009 paper</a><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> on <strong>COPASI</strong> use cases.</p>
-<p>If we want to optimise something, we either want to <em>minimize</em> or <em>maximize</em> a specific task value.</p>
+<p>This document follows closely the <a
+href="https://doi.org/10.1007/978-1-59745-525-1_2">Mendes 2009
+paper</a><a href="#fn1" class="footnote-ref"
+id="fnref1"><sup>1</sup></a> on <strong>COPASI</strong> use cases.</p>
+<p>If we want to optimise something, we either want to <em>minimise</em>
+or <em>maximise</em> a specific target value.</p>
 <div id="setup" class="section level1">
 <h1>Setup</h1>
-<p>First, we have to load <strong>CoRC</strong> and <strong>tidyverse</strong>. Make sure you have these packages downloaded. If you have not yet downloaded CoRC, take a look at the tab <strong>Download</strong></p>
+<p>First, we have to load <strong>CoRC</strong> and
+<strong>tidyverse</strong>. Make sure you have these packages
+downloaded. If you have not yet downloaded CoRC, take a look at the tab
+<strong>Download</strong>.</p>
 </div>
 <div id="section" class="section level1 tabset">
 <h1 class="tabset"></h1>
@@ -352,7 +359,13 @@ remotes::install_github(&quot;jpahle/CoRC&quot;)</code></pre>
 </div>
 <div id="loading-the-model" class="section level1">
 <h1>Loading the model</h1>
-<p>We will work with model <a href="https://www.ebi.ac.uk/biomodels/BIOMD0000000023">Nr. 23 in BioModels</a><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, which is a simulation of analyzing sucrose accumulation in sugar cane (Rohwer 2001). The model can be loaded directly from the biomodels database; in case this does not work it is also stored in this repository (see commented out line).</p>
+<p>We will work with model <a
+href="https://www.ebi.ac.uk/biomodels/BIOMD0000000023">Nr. 23 in
+BioModels</a><a href="#fn2" class="footnote-ref"
+id="fnref2"><sup>2</sup></a>, which is a simulation of analyzing sucrose
+accumulation in sugar cane (Rohwer 2001). The model can be loaded
+directly from the biomodels database; in case this does not work it is
+also stored in this repository (see commented-out line).</p>
 <pre class="r"><code>loadSBML(biomodels_url(id = 23, format = &quot;sbml&quot;))
 #&gt; # A COPASI model reference:
 #&gt; Model name: &quot;Rohwer2001_Sucrose&quot;
@@ -362,24 +375,29 @@ remotes::install_github(&quot;jpahle/CoRC&quot;)</code></pre>
 
 # if that does not work, try:
 # loadSBML(&quot;https://raw.githubusercontent.com/jpahle/DynamiCoRC/main/models/BIOMD0000000023_url.xml&quot;)</code></pre>
-<p>CoRC will give out general specifications about the model upon loading. To get a better understanding of the model, we will first take a look at the reactions:</p>
+<p>CoRC will give out general specifications about the model upon
+loading. To get a better understanding of the model, we will first take
+a look at the reactions:</p>
 <pre class="r"><code>getReactions()
-#&gt; # A tibble: 11 x 6
+#&gt; # A tibble: 11 × 6
 #&gt;    key   name  reaction                      rate_law           flux number_flux
 #&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;                         &lt;chr&gt;             &lt;dbl&gt;       &lt;dbl&gt;
-#&gt;  1 (v1)  v1    Fruex = Fru                   FunctionDB.Funct~     0           0
-#&gt;  2 (v2)  v2    Glcex = Glc                   FunctionDB.Funct~     0           0
-#&gt;  3 (v3)  v3    ATP + Glc = HexP + ADP;  Fru  FunctionDB.Funct~     0           0
-#&gt;  4 (v4)  v4    Fru + ATP = HexP + ADP;  Glc  FunctionDB.Funct~     0           0
-#&gt;  5 (v5)  v5    Fru + ATP = HexP + ADP        FunctionDB.Funct~     0           0
-#&gt;  6 (v6)  v6    2 * HexP = UDP + Suc6P;  phos FunctionDB.Funct~     0           0
-#&gt;  7 (v7)  v7    Suc6P = Suc + phos            FunctionDB.Funct~     0           0
-#&gt;  8 (v8)  v8    HexP + Fru = Suc + UDP        FunctionDB.Funct~     0           0
-#&gt;  9 (v9)  v9    Suc = Fru + Glc               FunctionDB.Funct~     0           0
-#&gt; 10 (v10) v10   HexP = glycolysis             FunctionDB.Funct~     0           0
-#&gt; 11 (v11) v11   Suc = Sucvac                  FunctionDB.Funct~     0           0</code></pre>
-<p>Of interest to us are reactions <em>v11</em> (accumulation of sucrose in vacuoles) and <em>v9</em> (hydrolysis of sucrose), which decreases our overall productivity.</p>
-<p>We can the behavior of the species in the plot below. The component we are interested in is Sucrose (Suc).</p>
+#&gt;  1 (v1)  v1    Fruex = Fru                   FunctionDB.Funct…     0           0
+#&gt;  2 (v2)  v2    Glcex = Glc                   FunctionDB.Funct…     0           0
+#&gt;  3 (v3)  v3    ATP + Glc = HexP + ADP;  Fru  FunctionDB.Funct…     0           0
+#&gt;  4 (v4)  v4    Fru + ATP = HexP + ADP;  Glc  FunctionDB.Funct…     0           0
+#&gt;  5 (v5)  v5    Fru + ATP = HexP + ADP        FunctionDB.Funct…     0           0
+#&gt;  6 (v6)  v6    2 * HexP = UDP + Suc6P;  phos FunctionDB.Funct…     0           0
+#&gt;  7 (v7)  v7    Suc6P = Suc + phos            FunctionDB.Funct…     0           0
+#&gt;  8 (v8)  v8    HexP + Fru = Suc + UDP        FunctionDB.Funct…     0           0
+#&gt;  9 (v9)  v9    Suc = Fru + Glc               FunctionDB.Funct…     0           0
+#&gt; 10 (v10) v10   HexP = glycolysis             FunctionDB.Funct…     0           0
+#&gt; 11 (v11) v11   Suc = Sucvac                  FunctionDB.Funct…     0           0</code></pre>
+<p>Of interest to us are reactions <em>v11</em> (accumulation of sucrose
+in vacuoles) and <em>v9</em> (hydrolysis of sucrose), which decreases
+our overall productivity.</p>
+<p>We can see the behaviour of the species in the plot below. The
+component we are interested in is Sucrose (Suc).</p>
 </div>
 <div id="section-2" class="section level1 tabset">
 <h1 class="tabset"></h1>
@@ -400,9 +418,15 @@ ggplot(data = tc1) +
 </div>
 <div id="the-objective-function" class="section level1">
 <h1>The objective function</h1>
-<p>We want to maximize our productivity, which we can define as the ratio of fluxes of accumulation over hydrolysis. <span class="math inline">\(J_{v11}/J_{v9}\)</span>. For our optimisation algorithms it is necessary to define our optimisation goal as a <strong>minimum</strong>: we want to minimize <span class="math inline">\(J_{v9}/J_{v11}\)</span></p>
+<p>We want to maximise our productivity, which we can define as the
+ratio of fluxes of accumulation over hydrolysis. <span
+class="math inline">\(J_{v11}/J_{v9}\)</span>. For our optimisation
+algorithms it is necessary to define our optimisation goal as a
+<strong>minimum</strong>: we want to minimize <span
+class="math inline">\(J_{v9}/J_{v11}\)</span></p>
 <p>What we just defined is called an <em>objective function</em>.</p>
-<p>In <strong>CoRC</strong> we can define the objective function like this:</p>
+<p>In <strong>CoRC</strong> we can define the objective function like
+this:</p>
 </div>
 <div id="section-4" class="section level1 tabset">
 <h1 class="tabset"></h1>
@@ -422,8 +446,17 @@ objf
 </div>
 <div id="the-parameters" class="section level1">
 <h1>The parameters</h1>
-<p>Now we have to think about, what we are able to change to reach the minimum possible value for our objective function. We can assume for this teaching example that we are able to manipulate the steady state levels of our enzymes in reactions <em>v1</em>, <em>v2</em>, <em>v3</em>, <em>v4</em> and <em>v5</em>.</p>
-<p>We have to define our optimisation parameters in <strong>CoRC</strong>. It is possible to specify several aspects of our parameters, e.g. give them a specific starting value or bounds on how far the estimation is allowed to search. We will say that we can downregulate an enzyme by 50% or overexpress it by 400%. The start values are going to be the current values in our model.</p>
+<p>Now we have to think about, what we are able to change to reach the
+minimum possible value for our objective function. We can assume for
+this teaching example that we are able to manipulate the steady state
+levels of our enzymes in reactions <em>v1</em>, <em>v2</em>,
+<em>v3</em>, <em>v4</em> and <em>v5</em>.</p>
+<p>We have to define our optimisation parameters in
+<strong>CoRC</strong>. It is possible to specify several aspects of our
+parameters, e.g. give them a specific starting value or bounds on how
+far the estimation is allowed to search. We will say that we can
+downregulate an enzyme by 50% or overexpress it by 400%. The start
+values are going to be the current values in our model.</p>
 </div>
 <div id="section-6" class="section level1 tabset">
 <h1 class="tabset"></h1>
@@ -471,17 +504,29 @@ parameters &lt;- lapply(c(&quot;(v1).Vmax1&quot;, &quot;(v2).Vmax2&quot;, &quot;
 </div>
 <div id="optimisation-method" class="section level1">
 <h1>Optimisation method</h1>
-<p>Now we have to choose which optimisation method we will use for optimisation. For our first try we will use <em>Truncated Newton</em>. There are a lot of different methods available in <strong>CoRC</strong> which you can find in the documentation of the <code>runOptimization()</code> function.</p>
+<p>Now we have to choose which optimisation method we will use for
+optimisation. For our first try we will use <em>Truncated Newton</em>.
+There are a lot of different methods available in <strong>CoRC</strong>
+which you can find in the documentation of the
+<code>runOptimization()</code> function.</p>
 <pre class="r"><code>method &lt;- &#39;TruncatedNewton&#39;</code></pre>
-<p>Bear in mind, that there is no such thing as “the perfect” or “the right” optimisation method. It is always advisable to try out several (global and local) algorithms.</p>
+<p>Bear in mind, that there is no such thing as “the perfect” or “the
+right” optimisation method. It is always advisable to try out several
+(global and local) algorithms.</p>
 </div>
 <div id="optimisation" class="section level1">
 <h1>Optimisation</h1>
-<p>Now we have all elements we need for our optimisation routine. We still need to specify a few arguments in our function:</p>
+<p>Now we have all elements we need for our optimisation routine. We
+still need to specify a few arguments in our function:</p>
 <ul>
-<li>subtask: As the subtask we define <code>steadyState</code>, as our optimisation optimises fluxes in the steady state</li>
-<li>randomize_start_values: We just took the time specifying where our start values are so we don’t want to randomize them all again. If we think we always find a local minimum instead of a global one, it might be helpful to randomize the start values.</li>
-<li>update_model: We will save our current parameter values, so we can update the model in this function and not lose them.</li>
+<li>subtask: As the subtask we define <code>steadyState</code>, as our
+optimisation optimises fluxes in the steady state</li>
+<li>randomize_start_values: We just took the time specifying where our
+start values are so we don’t want to randomize them all again. If we
+think we always find a local minimum instead of a global one, it might
+be helpful to randomize the start values.</li>
+<li>update_model: We will save our current parameter values, so we can
+update the model in this function and not lose them.</li>
 </ul>
 <pre class="r"><code>par_before &lt;- getParameters()$value
 
@@ -494,7 +539,7 @@ result &lt;- runOptimization(expression = objf,
 result$main$objective_value
 #&gt; [1] 0.07816841
 result$parameters
-#&gt; # A tibble: 5 x 6
+#&gt; # A tibble: 5 × 6
 #&gt;   parameter  lower_bound start_value  value upper_bound gradient
 #&gt;   &lt;chr&gt;            &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;
 #&gt; 1 (v1).Vmax1      0.143       0.339  0.339        1.14  -0.254  
@@ -521,16 +566,26 @@ ggplot()+
 </div>
 <div id="section-9" class="section level1 unnumbered">
 <h1 class="unnumbered"></h1>
-<p>The dashed lines were from the timecourse before the optimisation, so we can see that our optimisation routine worked very well!</p>
+<p>The dashed lines were from the timecourse before the optimisation, so
+we can see that our optimisation routine worked very well!</p>
 <div id="references" class="section level2">
 <h2>References</h2>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. <a href="https://doi.org/10.1007/978-1-59745-525-1_2" class="uri">https://doi.org/10.1007/978-1-59745-525-1_2</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Rohwer, Johann M., and Frederik C. Botha. “Analysis of sucrose accumulation in the sugar cane culm on the basis of in vitro kinetic data.” Biochemical Journal 358.2 (2001): 437-445.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>Mendes P., Hoops S., Sahle S., Gauges R., Dada J.,
+Kummer U. (2009) Computational Modeling of Biochemical Networks Using
+COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology
+(Methods and Protocols), vol 500. Humana Press. <a
+href="https://doi.org/10.1007/978-1-59745-525-1_2"
+class="uri">https://doi.org/10.1007/978-1-59745-525-1_2</a><a
+href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Rohwer, Johann M., and Frederik C. Botha. “Analysis of
+sucrose accumulation in the sugar cane culm on the basis of in vitro
+kinetic data.” Biochemical Journal 358.2 (2001): 437-445.<a
+href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

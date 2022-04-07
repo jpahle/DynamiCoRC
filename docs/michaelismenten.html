@@ -326,7 +326,12 @@ $(document).ready(function () {
 
 <div id="setup" class="section level1">
 <h1>Setup</h1>
-<p>The code in this teaching document uses the <strong>R</strong> packages <a href="https://jpahle.github.io/CoRC/index.html"><strong>CoRC</strong></a> and <a href="https://www.tidyverse.org/"><strong>tidyverse</strong></a>. Make sure they are installed before beginning. If you have not yet downloaded CoRC, take a look at the tab <strong>Download</strong></p>
+<p>The code in this teaching document uses the <strong>R</strong>
+packages <a
+href="https://jpahle.github.io/CoRC/index.html"><strong>CoRC</strong></a>
+and <a href="https://www.tidyverse.org/"><strong>tidyverse</strong></a>.
+Make sure they are installed before beginning. If you have not yet
+downloaded CoRC, take a look at the tab <strong>Download</strong>.</p>
 </div>
 <div id="section" class="section level1 tabset">
 <h1 class="tabset"></h1>
@@ -350,30 +355,58 @@ remotes::install_github(&quot;jpahle/CoRC&quot;)</code></pre>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Michaelis-Menten-Kinetics, introduced by Leonor Michaelis and Maud Menten<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> is a popular model of enzyme kinetics.</p>
-<p>If you have a substrate <span class="math inline">\(S\)</span> and product <span class="math inline">\(P\)</span> and the reaction is catalyzed by enzyme <span class="math inline">\(E\)</span>, you <em>can</em> use Michaelis-Menten-Kinetics to describe this process. The rate of formation of the product (<span class="math inline">\(v\)</span>) is given by</p>
-<p><span class="math display">\[ 
+<p>Michaelis-Menten-Kinetics, introduced by Leonor Michaelis and Maud
+Menten<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+is a popular model of enzyme kinetics.</p>
+<p>If you have a substrate <span class="math inline">\(S\)</span> and
+product <span class="math inline">\(P\)</span> and the reaction is
+catalyzed by enzyme <span class="math inline">\(E\)</span>, you
+<em>can</em> use Michaelis-Menten-Kinetics to describe this process. The
+rate of formation of the product (<span
+class="math inline">\(v\)</span>) is given by</p>
+<p><span class="math display">\[
 v = \frac{V_{max} * [S]}{K_M + [S]}
 \]</span></p>
-<p>with <span class="math inline">\(V_{max}\)</span> as the maximum rate of product formation (at saturating substrate concentration) and <span class="math inline">\(K_M\)</span> the value of the Michaelis-Constant.</p>
+<p>with <span class="math inline">\(V_{max}\)</span> the maximum rate of
+product formation (at saturating substrate concentration) and <span
+class="math inline">\(K_M\)</span> the value of the
+Michaelis-Constant.</p>
 </div>
 <div id="derivation" class="section level1">
 <h1>Derivation</h1>
-<p>Michaelis-Menten kinetics follow the assumption that enzyme-catalyzed reactions follow a two step process</p>
-<p><span class="math display">\[ 
+<p>Michaelis-Menten kinetics follow the assumption that enzyme-catalyzed
+reactions follow a two step process</p>
+<p><span class="math display">\[
 S + E \rightleftharpoons SE \rightarrow E + P
 \]</span></p>
-<p>where the substrate and the enzyme reversibly form a complex <span class="math inline">\(SE\)</span> (with parameters <span class="math inline">\(k_f\)</span> and <span class="math inline">\(k_r\)</span> for forward and reverse reactions) which then catalyzes the formation of the product and the release of the enzyme (with reaction parameter <span class="math inline">\(k_{cat}\)</span>).</p>
-<p>In this model, all our reaction follow <em>Mass-action kinetics</em> where the reaction rate is proportional to the concentration of the substrates.</p>
-<p>We can denote our reaction rates for the two reaction as following:</p>
+<p>where the substrate and the enzyme reversibly form a complex <span
+class="math inline">\(SE\)</span> (with parameters <span
+class="math inline">\(k_f\)</span> and <span
+class="math inline">\(k_r\)</span> for forward and reverse reactions)
+which then catalyses the formation of the product and the release of the
+enzyme (with reaction parameter <span
+class="math inline">\(k_{cat}\)</span>).</p>
+<p>In this model, all our reaction follow <em>Mass-action kinetics</em>
+where the reaction rate is proportional to the concentration of the
+substrates.</p>
+<p>We can denote our reaction rates for the two reactions as
+follows:</p>
 <p>1.) <span class="math inline">\(k_f*([S]+[E]) - k_r*[SE]\)</span></p>
 <p>2.) <span class="math inline">\(k_{cat}*[SE]\)</span></p>
-<p>We can form 4 differential equations to describe the change of our species concentrations over time:</p>
-<p><span class="math display">\[\frac{d[S]}{dt} = - k_f[S][E] + k_r[SE]\]</span> <span class="math display">\[\frac{d[E]}{dt} = -k_f[S][E] + k_r[SE] + k_{cat}[SE]\]</span> <span class="math display">\[\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] - k_{cat}[SE] \]</span> <span class="math display">\[\frac{d[P]}{dt} = k_{cat}[SE]\]</span></p>
-<p>Another important assumption is, that <strong>the concentration of the substrate is much higher than the concentration of the enzyme</strong>.</p>
+<p>We can form 4 differential equations to describe the change of our
+species concentrations over time:</p>
+<p><span class="math display">\[\frac{d[S]}{dt} = - k_f[S][E] +
+k_r[SE]\]</span> <span class="math display">\[\frac{d[E]}{dt} =
+-k_f[S][E] + k_r[SE] + k_{cat}[SE]\]</span> <span
+class="math display">\[\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] -
+k_{cat}[SE] \]</span> <span class="math display">\[\frac{d[P]}{dt} =
+k_{cat}[SE]\]</span></p>
+<p>Another important assumption is, that <strong>the concentration of
+the substrate is much higher than the concentration of the
+enzyme</strong>.</p>
 <div id="model-in-corc" class="section level2">
 <h2>Model in CoRC</h2>
-<p>We can visualize this model using <strong>CoRC</strong>:</p>
+<p>We can visualise this model using <strong>CoRC</strong>:</p>
 <p>First, we have to create a new model</p>
 <pre class="r"><code>newModel()
 #&gt; # A COPASI model reference:
@@ -382,41 +415,60 @@ S + E \rightleftharpoons SE \rightarrow E + P
 #&gt; Number of species: 0
 #&gt; Number of reactions: 0
 setModelName(&quot;Manual Michaelis Menten&quot;)</code></pre>
-<p>Next, we can put in our reactions. Species that are called in the reaction creation and are not part of the model yet, will be added automatically. We can denote reversible reactions with an <code>=</code> sign, and non-reversible reactions with an arrow <code>-&gt;</code>. Hint: Make sure that all species and operators are separated by a space, otherwise <strong>CoRC</strong> will not see them as distinct species/things.</p>
+<p>Next, we can put in our reactions. Species that are called in the
+reaction creation and are not part of the model yet, will be added
+automatically. We can denote reversible reactions with an <code>=</code>
+sign, and non-reversible reactions with an arrow <code>-&gt;</code>.
+Hint: Make sure that all species and operators are separated by a space,
+otherwise <strong>CoRC</strong> will not see them as distinct
+species/things.</p>
 <pre class="r"><code>newReaction(&quot;S + E = SE&quot;)
 #&gt; [1] &quot;(S + E = SE)&quot;
 newReaction(&quot;SE -&gt; P + E&quot;)
 #&gt; [1] &quot;(SE -&gt; P + E)&quot;</code></pre>
-<p>We will now take a look at the species and the reactions in our model.</p>
+<p>We will now take a look at the species and the reactions in our
+model.</p>
 <pre class="r"><code>getSpecies()
-#&gt; # A tibble: 4 x 13
-#&gt;   key             name  compartment type   unit  initial_concent~ initial_number
+#&gt; # A tibble: 4 × 13
+#&gt;   key             name  compartment type   unit  initial_concent… initial_number
 #&gt;   &lt;chr&gt;           &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;            &lt;dbl&gt;          &lt;dbl&gt;
-#&gt; 1 E{compartment}  E     compartment react~ mol/l                1        6.02e23
-#&gt; 2 S{compartment}  S     compartment react~ mol/l                1        6.02e23
-#&gt; 3 SE{compartment} SE    compartment react~ mol/l                1        6.02e23
-#&gt; 4 P{compartment}  P     compartment react~ mol/l                1        6.02e23
-#&gt; # ... with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
+#&gt; 1 E{compartment}  E     compartment react… mol/l                1        6.02e23
+#&gt; 2 S{compartment}  S     compartment react… mol/l                1        6.02e23
+#&gt; 3 SE{compartment} SE    compartment react… mol/l                1        6.02e23
+#&gt; 4 P{compartment}  P     compartment react… mol/l                1        6.02e23
+#&gt; # … with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
 #&gt; #   number_rate &lt;dbl&gt;, initial_expression &lt;chr&gt;, expression &lt;chr&gt;
 getReactions()
-#&gt; # A tibble: 2 x 6
+#&gt; # A tibble: 2 × 6
 #&gt;   key           name        reaction    rate_law                flux number_flux
 #&gt;   &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;                  &lt;dbl&gt;       &lt;dbl&gt;
-#&gt; 1 (S + E = SE)  S + E = SE  S + E = SE  FunctionDB.Functions[~     0           0
-#&gt; 2 (SE -&gt; P + E) SE -&gt; P + E SE -&gt; P + E FunctionDB.Functions[~     0           0
+#&gt; 1 (S + E = SE)  S + E = SE  S + E = SE  FunctionDB.Functions[…     0           0
+#&gt; 2 (SE -&gt; P + E) SE -&gt; P + E SE -&gt; P + E FunctionDB.Functions[…     0           0
 getReactions()$rate_law
 #&gt; [1] &quot;FunctionDB.Functions[Mass action (reversible)]&quot;  
 #&gt; [2] &quot;FunctionDB.Functions[Mass action (irreversible)]&quot;</code></pre>
-<p>As you can see, the species in the model all start with a concentration of 1. This obviously does not make sense for our model, because at the beginning, we don’t want there to be any complex or product. Also, we will need to make sure that there is a lot more substrate than complex (as this is one of the assumptions). The reactions look fine; the rate law is automatically set to Mass Action Kinetics, which is (as you will see below) needed for Michaelis-Menten Kinetics.</p>
+<p>As you can see, the species in the model all start with a
+concentration of 1. This obviously does not make sense for our model,
+because at the beginning, we don’t want there to be any complex or
+product. Also, we will need to make sure that there is a lot more
+substrate than complex (as this is one of the assumptions). The
+reactions look fine; the rate law is automatically set to Mass Action
+Kinetics, which is (as you will see below) needed for Michaelis-Menten
+Kinetics.</p>
 <pre class="r"><code>setSpecies(key = species(), initial_concentration = c(1,20,0,0))</code></pre>
-<p>Now, we want to know how our model behaves. For this, we will simulate how our species interact with each other in a <em>time course</em>. The <code>runTimeCourse()</code> command gives us a list with a lot of different aspects, but for now, only the “result” section is interesting to us.</p>
+<p>Now, we want to know how our model behaves. For this, we will
+simulate how our species interact with each other in a <em>time
+course</em>. The <code>runTimeCourse()</code> command gives us a list
+with a lot of different aspects, but for now, only the “result” section
+is interesting to us.</p>
 <pre class="r"><code>timecourse &lt;- runTimeCourse(duration = 1000, dt = 1)$result</code></pre>
-<p>We will now need to reshape the data to make it printable with ggplot.</p>
+<p>We will now need to reshape the data to make it printable with
+ggplot.</p>
 <pre class="r"><code>#Reshape
 timecourse &lt;- pivot_longer(timecourse, -Time, values_to = &quot;Concentration&quot;, names_to = &quot;Species&quot;)
 
 timecourse
-#&gt; # A tibble: 4,004 x 3
+#&gt; # A tibble: 4,004 × 3
 #&gt;     Time Species Concentration
 #&gt;    &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
 #&gt;  1     0 E              1     
@@ -429,39 +481,93 @@ timecourse
 #&gt;  8     1 P              0.0536
 #&gt;  9     2 E              0.108 
 #&gt; 10     2 S             19.0   
-#&gt; # ... with 3,994 more rows
+#&gt; # … with 3,994 more rows
 
 #Plot data
 ggplot(data = timecourse, mapping = aes(x = Time, y = Concentration, color = Species))+
   geom_line()</code></pre>
 <p><img src="michaelismenten_files/figure-html/unnamed-chunk-9-1.png" width="100%" /></p>
-<p>There are two ways of deriving the Michaelis-Menten Kinetics from here. The <em>Quasi-Steady-State Assumption</em> and the <em>Equilibirum approximation</em>. You have to keep in mind, that both of these have underlying assumptions that need not necessarily be true for your model.</p>
+<p>There are two ways of deriving the Michaelis-Menten Kinetics from
+here. The <em>Quasi-Steady-State Assumption</em> and the <em>Equilibrium
+approximation</em>. You have to keep in mind, that both of these have
+underlying assumptions that need not necessarily be true for your
+model.</p>
 </div>
 <div id="quasi-steady-state-assumption" class="section level2">
 <h2>Quasi-steady-state Assumption</h2>
-<p>The approximation taken in this assumption is, that the <strong>concentration of the complex is in steady state</strong> (at least in the time scale of product formation that we are interested in). This derivation was proposed by Briggs and Heldane <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> and is a bit more intuitive than the original (below).</p>
-<p>So, we assume the concentration of the complex does not change over time. <span class="math display">\[\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] - k_{cat}[SE] = 0 \]</span> We can rearrange this to <span class="math display">\[ k_f[S][E] = k_r[SE] + k_{cat}[SE] = [SE](k_r + k_{cat})\]</span></p>
-<p>We can see that no enzyme is being destroyed in any process of our model. So we can infer that our total enzyme concentration <span class="math inline">\(E_0\)</span> does not change over time.</p>
-<p><span class="math display">\[ [E_0] =  [E] + [ES] = constant \]</span> and from this we get <span class="math display">\[ [E] = [E_0]-[ES]\]</span> With this, we can solve our expression</p>
-<p><span class="math display">\[k_f[S][E] = [ES](k_r + k_{cat}) \]</span> by inserting it into this formula:</p>
-<p><span class="math display">\[k_f[S]*([E_0]-[ES]) = [ES](k_r + k_{cat}) \]</span> <span class="math display">\[k_f[S][E_0] - k_f[S][ES] = [ES](k_r + k_{cat}) \]</span> <span class="math display">\[k_f[S][E_0] = [ES](k_r + k_{cat} + k_f[S])\]</span> <span class="math display">\[[ES] = \frac{k_f[S][E_0]}{k_r + k_{cat} + k_f[S]}\]</span> We can use a trick and multiply <span class="math inline">\(k_f\)</span> out in the denominator to get rid of <span class="math inline">\(k_f\)</span> in the numerator <span class="math display">\[[ES]= \frac{k_f[S][E_0]}{k_f(\frac{k_r+k_{cat}}{k_f}+[S])}\]</span> <span class="math display">\[[ES]= \frac{[S][E_0]}{(\frac{k_r+k_{cat}}{k_f}+[S])}\]</span> Now, to make it nicer to look at, we will define: <span class="math display">\[ \frac{k_r + k_{cat}}{k_f} = K_M \]</span> Our equation now looks already very similar to the Michaelis-Menten-Kinetics <span class="math display">\[[ES] = \frac{[S][E_0]}{K_M + [S]}\]</span></p>
-<p>What we now want is the velocity of the product formation: <span class="math display">\[v = \frac{d[P]}{dt} = k_{cat}[ES] \]</span> We can insert what we derived about the <span class="math inline">\([ES]\)</span> in the second to last equation: <span class="math display">\[ v = k_{cat} * \frac{[S][E_0]}{K_M + [S]} \]</span> Now, we can say, that if all available enzyme was creating the product at the same time (<span class="math inline">\([E_0] * k_{cat}\)</span>), we would have the maximum velocity (<span class="math inline">\(V_{max}\)</span>) of this reaction. So we can define:</p>
+<p>The approximation taken in this assumption is, that the
+<strong>concentration of the complex is in steady state</strong> (at
+least in the time scale of product formation that we are interested in).
+This derivation was proposed by Briggs and Heldane <a href="#fn2"
+class="footnote-ref" id="fnref2"><sup>2</sup></a> and is a bit more
+intuitive than the original (below).</p>
+<p>So, we assume the concentration of the complex does not change over
+time. <span class="math display">\[\frac{d[ES]}{dt} = k_f[S][E] -
+k_r[SE] - k_{cat}[SE] = 0 \]</span> We can rearrange this to <span
+class="math display">\[ k_f[S][E] = k_r[SE] + k_{cat}[SE] = [SE](k_r +
+k_{cat})\]</span></p>
+<p>We can see that no enzyme is being destroyed in any process of our
+model. So we can infer that our total enzyme concentration <span
+class="math inline">\(E_0\)</span> does not change over time.</p>
+<p><span class="math display">\[ [E_0] =  [E] + [ES] = constant
+\]</span> and from this we get <span class="math display">\[ [E] =
+[E_0]-[ES]\]</span> With this, we can solve our expression</p>
+<p><span class="math display">\[k_f[S][E] = [ES](k_r + k_{cat})
+\]</span> by inserting it into this formula:</p>
+<p><span class="math display">\[k_f[S]*([E_0]-[ES]) = [ES](k_r +
+k_{cat}) \]</span> <span class="math display">\[k_f[S][E_0] - k_f[S][ES]
+= [ES](k_r + k_{cat}) \]</span> <span class="math display">\[k_f[S][E_0]
+= [ES](k_r + k_{cat} + k_f[S])\]</span> <span
+class="math display">\[[ES] = \frac{k_f[S][E_0]}{k_r + k_{cat} +
+k_f[S]}\]</span> We can use a trick and multiply <span
+class="math inline">\(k_f\)</span> out in the denominator to get rid of
+<span class="math inline">\(k_f\)</span> in the numerator <span
+class="math display">\[[ES]=
+\frac{k_f[S][E_0]}{k_f(\frac{k_r+k_{cat}}{k_f}+[S])}\]</span> <span
+class="math display">\[[ES]=
+\frac{[S][E_0]}{(\frac{k_r+k_{cat}}{k_f}+[S])}\]</span> Now, to make it
+nicer to look at, we will define: <span class="math display">\[
+\frac{k_r + k_{cat}}{k_f} = K_M \]</span> Our equation now looks already
+very similar to the Michaelis-Menten-Kinetics <span
+class="math display">\[[ES] = \frac{[S][E_0]}{K_M + [S]}\]</span></p>
+<p>What we now want is the velocity of the product formation: <span
+class="math display">\[v = \frac{d[P]}{dt} = k_{cat}[ES] \]</span> We
+can insert what we derived about the <span
+class="math inline">\([ES]\)</span> in the second to last equation:
+<span class="math display">\[ v = k_{cat} * \frac{[S][E_0]}{K_M + [S]}
+\]</span> Now, we can say, that if all available enzyme was creating the
+product at the same time (<span class="math inline">\([E_0] *
+k_{cat}\)</span>), we would have the maximum velocity (<span
+class="math inline">\(V_{max}\)</span>) of this reaction. So we can
+define:</p>
 <p><span class="math display">\[ V_{max} = [E_0]*k_{cat} \]</span></p>
-<p>Finally, when we insert this in our reaction velocity, we get the Michaelis-Menten Reaction kinetics:</p>
-<p><span class="math display">\[v = \frac{V_{max}[S]}{K_M + [S]} \]</span></p>
+<p>Finally, when we insert this in our reaction velocity, we get the
+Michaelis-Menten Reaction kinetics:</p>
+<p><span class="math display">\[v = \frac{V_{max}[S]}{K_M + [S]}
+\]</span></p>
 </div>
 <div id="equilibrium-approximation" class="section level2">
 <h2>Equilibrium approximation</h2>
-<p>Alternatively, we can approximate these kinetics by applying an Equilibrium approximation, where we assume that the <strong>substrate is in chemical equilibrium with the complex</strong>. This was the original derivation from Leonor Michaelis and Maud Menten. We assume that the forward reaction is equal to the backwards reaction:</p>
+<p>Alternatively, we can approximate these kinetics by applying an
+Equilibrium approximation, where we assume that the <strong>substrate is
+in chemical equilibrium with the complex</strong>. This was the original
+derivation from Leonor Michaelis and Maud Menten. We assume that the
+forward reaction is equal to the backwards reaction:</p>
 <p><span class="math display">\[k_f[S][E] = k_r[SE]\]</span></p>
-<p>The derivation of the Michaelis-Menten kinetics from this is similar to above, so we will skip that.</p>
+<p>The derivation of the Michaelis-Menten kinetics from this is similar
+to the above derivation (the interpretation of the Michaelis constant is
+slightly different though), so we will skip that.</p>
 </div>
 </div>
 <div id="comparing-models" class="section level1">
 <h1>Comparing models</h1>
-<p>Now, we want to show how our Michaelis-Menten-Kinetics work. For this, we will plot the substrate and product concentration of our model next to the substrate and product concentration of a model with inbuilt Michaelis-Menten-Kinetics that looks like this:</p>
+<p>Now, we want to show how our Michaelis-Menten-Kinetics work. For
+this, we will plot the substrate and product concentration of our model
+next to the substrate and product concentration of a model with built-in
+Michaelis-Menten-Kinetics that looks like this:</p>
 <p><span class="math display">\[ S \rightarrow P \]</span></p>
-<p>We will first save a reference to our current model in a variable to start working on a new model:</p>
+<p>We will first save a reference to our current model in a variable to
+start working on a new model:</p>
 <pre class="r"><code>manualMM &lt;- getCurrentModel()
 
 newModel()
@@ -471,41 +577,63 @@ newModel()
 #&gt; Number of species: 0
 #&gt; Number of reactions: 0
 setModelName(&quot;Inbuilt Michaelis Menten&quot;)</code></pre>
-<p>We only need one reaction, but we need to set our rate law to “Michaelis-Menten”.</p>
+<p>We only need one reaction, but we need to set our rate law to
+“Michaelis-Menten”.</p>
 <pre class="r"><code>newReaction(&quot;S -&gt; P&quot;, fun = &quot;Michaelis-Menten (irreversible)&quot;)
 #&gt; [1] &quot;(S -&gt; P)&quot;
 inbuiltMM &lt;- getCurrentModel()</code></pre>
-<p>We need to make sure that our models have the same parameters so that they would behave the same, if they are the same. Let us take a look at the parameters:</p>
+<p>We need to make sure that our models have the same parameters so that
+they would behave the same, if they are the same. Let us take a look at
+the parameters:</p>
 <pre class="r"><code>getParameters(model = manualMM)
-#&gt; # A tibble: 3 x 5
+#&gt; # A tibble: 3 × 5
 #&gt;   key              name  reaction    value mapping
 #&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;  
 #&gt; 1 (S + E = SE).k1  k1    S + E = SE    0.1 &lt;NA&gt;   
 #&gt; 2 (S + E = SE).k2  k2    S + E = SE    0.1 &lt;NA&gt;   
 #&gt; 3 (SE -&gt; P + E).k1 k1    SE -&gt; P + E   0.1 &lt;NA&gt;
 getParameters(model = inbuiltMM)
-#&gt; # A tibble: 2 x 5
+#&gt; # A tibble: 2 × 5
 #&gt;   key         name  reaction value mapping
 #&gt;   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;  
 #&gt; 1 (S -&gt; P).Km Km    S -&gt; P     0.1 &lt;NA&gt;   
 #&gt; 2 (S -&gt; P).V  V     S -&gt; P     0.1 &lt;NA&gt;</code></pre>
-<p>As we can see, our inbuilt reaction still needs some parameters set, to make the models comparable. The <span class="math inline">\(K_M\)</span> we can easily be set with our formula which was derived earlier:</p>
-<p><span class="math display">\[K_M = \frac{k_r + k_{cat}}{k_f} \]</span></p>
-<p>The parameters in our model correspond to (from top to bottom): <span class="math inline">\(k_f\)</span>, <span class="math inline">\(k_r\)</span>, <span class="math inline">\(k_{cat}\)</span>. All of them are 0.1 so for <span class="math inline">\(K_M\)</span> we get <span class="math inline">\(K_M = 0.2 / 0.1 = 2\)</span>.</p>
-<p>Finding the <span class="math inline">\(v_{max}\)</span> is a bit more tricky. We defined: <span class="math display">\[ V_{max} = [E_0]*k_{cat} \]</span></p>
-<p><span class="math inline">\(k_{cat}\)</span> is 0.1, as we just found out, but for <span class="math inline">\(E_0\)</span> we need to take a look at the species in our manual Michaelis Menten Model:</p>
+<p>As we can see, our inbuilt reaction still needs some parameters set,
+to make the models comparable. The <span
+class="math inline">\(K_M\)</span> we can easily be set with our formula
+which was derived earlier:</p>
+<p><span class="math display">\[K_M = \frac{k_r + k_{cat}}{k_f}
+\]</span></p>
+<p>The parameters in our model correspond to (from top to bottom): <span
+class="math inline">\(k_f\)</span>, <span
+class="math inline">\(k_r\)</span>, <span
+class="math inline">\(k_{cat}\)</span>. All of them are 0.1 so for <span
+class="math inline">\(K_M\)</span> we get <span
+class="math inline">\(K_M = 0.2 / 0.1 = 2\)</span>.</p>
+<p>Finding the <span class="math inline">\(v_{max}\)</span> is a bit
+more tricky. We defined: <span class="math display">\[ V_{max} =
+[E_0]*k_{cat} \]</span></p>
+<p><span class="math inline">\(k_{cat}\)</span> is 0.1, as we just found
+out, but for <span class="math inline">\(E_0\)</span> we need to take a
+look at the species in our manual Michaelis Menten Model:</p>
 <pre class="r"><code>getSpecies(model = manualMM)
-#&gt; # A tibble: 4 x 13
-#&gt;   key             name  compartment type   unit  initial_concent~ initial_number
+#&gt; # A tibble: 4 × 13
+#&gt;   key             name  compartment type   unit  initial_concent… initial_number
 #&gt;   &lt;chr&gt;           &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;            &lt;dbl&gt;          &lt;dbl&gt;
-#&gt; 1 E{compartment}  E     compartment react~ mol/l                1        6.02e23
-#&gt; 2 S{compartment}  S     compartment react~ mol/l               20        1.20e25
-#&gt; 3 SE{compartment} SE    compartment react~ mol/l                0        0      
-#&gt; 4 P{compartment}  P     compartment react~ mol/l                0        0      
-#&gt; # ... with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
+#&gt; 1 E{compartment}  E     compartment react… mol/l                1        6.02e23
+#&gt; 2 S{compartment}  S     compartment react… mol/l               20        1.20e25
+#&gt; 3 SE{compartment} SE    compartment react… mol/l                0        0      
+#&gt; 4 P{compartment}  P     compartment react… mol/l                0        0      
+#&gt; # … with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
 #&gt; #   number_rate &lt;dbl&gt;, initial_expression &lt;chr&gt;, expression &lt;chr&gt;</code></pre>
-<p>The total enzyme concentration <span class="math inline">\(E_0\)</span> is defined as</p>
-<p><span class="math display">\[ [E_0] = [E] + [SE] = 1 + 0 = 1\]</span> and it follows for <span class="math inline">\(V_{max}\)</span> <span class="math display">\[ V_{max} = [E_0] * k_{cat} = 1 * 0.1 = 0.1 \]</span> We can set these parameters for our inbuilt Michalis Menten model. Additionally, we set the species starting concentration so that they are the same as for the manual model:</p>
+<p>The total enzyme concentration <span
+class="math inline">\(E_0\)</span> is defined as</p>
+<p><span class="math display">\[ [E_0] = [E] + [SE] = 1 + 0 = 1\]</span>
+and it follows for <span class="math inline">\(V_{max}\)</span> <span
+class="math display">\[ V_{max} = [E_0] * k_{cat} = 1 * 0.1 = 0.1
+\]</span> We can set these parameters for our inbuilt Michalis Menten
+model. Additionally, we set the species starting concentration so that
+they are the same as for the manual model:</p>
 <pre class="r"><code>setParameters(model = inbuiltMM, key = parameter(model = inbuiltMM), value = c(2, 0.1))
 setSpecies(model = inbuiltMM, key = species(model = inbuiltMM), initial_concentration = c(0,20))</code></pre>
 <p>Now, we can run a time course for both models:</p>
@@ -517,22 +645,47 @@ inbuiltTC &lt;- runTimeCourse(duration = 1000, dt = 0.1, model = inbuiltMM)$resu
   geom_line(data = inbuiltTC, mapping = aes(y = P, color = &quot;Product&quot;)) +
   geom_line(data = manualTC,  mapping = aes(y = S, color = &quot;Substrate&quot;), linetype = &quot;dotted&quot;)+
   geom_line(data = manualTC,  mapping = aes(y = P, color = &quot;Product&quot;), linetype = &quot;dotted&quot;)</code></pre>
-<p><img src="michaelismenten_files/figure-html/unnamed-chunk-16-1.png" width="100%" /> As you can see, the dotted (for manual) and the normal line vary slightly, but they are very similar.</p>
+<p><img src="michaelismenten_files/figure-html/unnamed-chunk-16-1.png" width="100%" />
+As you can see, the dotted (for manual) and the solid line (for inbuilt)
+vary slightly, but they are very similar.</p>
 </div>
 <div id="non-michaelis-menten-kinetics" class="section level1">
 <h1>Non-Michaelis-Menten Kinetics</h1>
-<p>We have seen, that the Michaelis-Menten Kinetics do not apply to every reaction in every model. From the assumptions that are in the Michaelis-Menten Kinetics, we can see which reactions cannot be approximated well with these kinetics.</p>
+<p>We have seen, that the Michaelis-Menten Kinetics do not apply to
+every reaction in every model. From the assumptions that are in the
+Michaelis-Menten Kinetics, we can see which reactions
+<strong>cannot</strong> be approximated well with these kinetics:</p>
 <ol class="example" style="list-style-type: decimal">
-<li><p>The Reaction is not catalyzed by an enzyme. This seems straightforward, but it is something to keep in mind. You need to have one species in your reaction that is needed for the reaction but does not change during the reaction.</p></li>
-<li><p>The concentration of the enzyme changes over time. Keep in mind that we assumed that <span class="math inline">\(E_0\)</span> (the total enzyme concentration) does not change over time. We need that assumption, and if it is not true, our model will not describe reality very well, if we still used Michaelis-Menten Kinetics.</p></li>
-<li><p>The concentration of the complex is not in Steady State / The substrate is not in equilibrium with the complex. This is the basis for the Quasi-Steady-State and Equilibrium assumption respecitvely. If this <em>assumption</em> is not true, we will not be able to model our reaction using Michaelis-Menten-Kinetics.</p></li>
-<li><p>Our reaction is not <span class="math inline">\(S + E \rightleftharpoons SE \rightarrow E + P\)</span>. Again, this seems really straightforward, but there are a lot of reactions that will not be described with this basis. What would happen, if you needed a helper binding to the enzyme for the substrate to bind? Or if you have two substrates, where one first binds to the enzyme and then the other? Or, very likely, the substrate to product reaction is not irreversible?</p></li>
+<li><p>The Reaction is not catalysed by an enzyme. This seems
+straightforward, but it is something to keep in mind. You need to have
+one species in your reaction that is needed for the reaction but does
+not change during the reaction.</p></li>
+<li><p>The concentration of the enzyme changes over time. Keep in mind
+that we assumed that <span class="math inline">\(E_0\)</span> (the total
+enzyme concentration) does not change over time. We need that
+assumption, and if it is not true, our model will not describe reality
+very well, if we still used Michaelis-Menten Kinetics.</p></li>
+<li><p>The concentration of the complex is not in steady state / The
+substrate is not in equilibrium with the complex. This is the basis for
+the Quasi-Steady-State and Quasi-Equilibrium assumption respectively. If
+this <em>assumption</em> is not true, we will not be able to model our
+reaction using Michaelis-Menten-Kinetics.</p></li>
+<li><p>Our reaction is not <span class="math inline">\(S + E
+\rightleftharpoons SE \rightarrow E + P\)</span>. Again, this seems
+really straightforward, but there are a lot of reactions that will not
+be described with this basis. What would happen, if you needed a helper
+binding to the enzyme for the substrate to bind? Or if you have two
+substrates, where one first binds to the enzyme and then the other? Or,
+very likely, the substrate to product reaction is not
+irreversible?</p></li>
 </ol>
 </div>
 <div id="what-happens-if-it-goes-wrong" class="section level1">
 <h1>What happens if it goes wrong</h1>
-<p>Let us try and model a few reaction with Michaelis-Menten-Kinetics, where the assumptions needed to apply the kinetics are not met.</p>
-<p>Let us start with one, where the equilibrium approximation does not hold:</p>
+<p>Let us try and model a few reaction with Michaelis-Menten-Kinetics,
+where the assumptions needed to apply the kinetics are not met.</p>
+<p>Let us start with one, where the equilibrium approximation does not
+hold:</p>
 <p><span class="math display">\[ k_f[S][E] \ne k_r[SE]\]</span></p>
 <pre class="r"><code># not Equilibrium
 newModel()
@@ -548,26 +701,27 @@ newReaction(&quot;SE -&gt; P + E&quot;)
 #&gt; [1] &quot;(SE -&gt; P + E)&quot;
 
 getSpecies()
-#&gt; # A tibble: 4 x 13
-#&gt;   key             name  compartment type   unit  initial_concent~ initial_number
+#&gt; # A tibble: 4 × 13
+#&gt;   key             name  compartment type   unit  initial_concent… initial_number
 #&gt;   &lt;chr&gt;           &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;            &lt;dbl&gt;          &lt;dbl&gt;
-#&gt; 1 E{compartment}  E     compartment react~ mol/l                1        6.02e23
-#&gt; 2 S{compartment}  S     compartment react~ mol/l                1        6.02e23
-#&gt; 3 SE{compartment} SE    compartment react~ mol/l                1        6.02e23
-#&gt; 4 P{compartment}  P     compartment react~ mol/l                1        6.02e23
-#&gt; # ... with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
+#&gt; 1 E{compartment}  E     compartment react… mol/l                1        6.02e23
+#&gt; 2 S{compartment}  S     compartment react… mol/l                1        6.02e23
+#&gt; 3 SE{compartment} SE    compartment react… mol/l                1        6.02e23
+#&gt; 4 P{compartment}  P     compartment react… mol/l                1        6.02e23
+#&gt; # … with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
 #&gt; #   number_rate &lt;dbl&gt;, initial_expression &lt;chr&gt;, expression &lt;chr&gt;
 getReactions()
-#&gt; # A tibble: 2 x 6
+#&gt; # A tibble: 2 × 6
 #&gt;   key           name        reaction    rate_law                flux number_flux
 #&gt;   &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;                  &lt;dbl&gt;       &lt;dbl&gt;
-#&gt; 1 (S + E -&gt; SE) S + E -&gt; SE S + E -&gt; SE FunctionDB.Functions[~     0           0
-#&gt; 2 (SE -&gt; P + E) SE -&gt; P + E SE -&gt; P + E FunctionDB.Functions[~     0           0
+#&gt; 1 (S + E -&gt; SE) S + E -&gt; SE S + E -&gt; SE FunctionDB.Functions[…     0           0
+#&gt; 2 (SE -&gt; P + E) SE -&gt; P + E SE -&gt; P + E FunctionDB.Functions[…     0           0
 
 setSpecies(key = species(), initial_concentration = c(1,20,0,0))
 
 noEqu &lt;- getCurrentModel()</code></pre>
-<p>And we can have another one, where the concentration of the Enzyme changes over time:</p>
+<p>And we can have another one, where the concentration of the enzyme
+changes over time:</p>
 <pre class="r"><code># Enzyme changes
 newModel()
 #&gt; # A COPASI model reference:
@@ -584,19 +738,19 @@ newReaction(&quot;E -&gt;&quot;)
 #&gt; [1] &quot;(E -&gt;)&quot;
 
 getSpecies()
-#&gt; # A tibble: 4 x 13
-#&gt;   key             name  compartment type   unit  initial_concent~ initial_number
+#&gt; # A tibble: 4 × 13
+#&gt;   key             name  compartment type   unit  initial_concent… initial_number
 #&gt;   &lt;chr&gt;           &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;            &lt;dbl&gt;          &lt;dbl&gt;
-#&gt; 1 E{compartment}  E     compartment react~ mol/l                1        6.02e23
-#&gt; 2 S{compartment}  S     compartment react~ mol/l                1        6.02e23
-#&gt; 3 SE{compartment} SE    compartment react~ mol/l                1        6.02e23
-#&gt; 4 P{compartment}  P     compartment react~ mol/l                1        6.02e23
-#&gt; # ... with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
+#&gt; 1 E{compartment}  E     compartment react… mol/l                1        6.02e23
+#&gt; 2 S{compartment}  S     compartment react… mol/l                1        6.02e23
+#&gt; 3 SE{compartment} SE    compartment react… mol/l                1        6.02e23
+#&gt; 4 P{compartment}  P     compartment react… mol/l                1        6.02e23
+#&gt; # … with 6 more variables: concentration &lt;dbl&gt;, number &lt;dbl&gt;, rate &lt;dbl&gt;,
 #&gt; #   number_rate &lt;dbl&gt;, initial_expression &lt;chr&gt;, expression &lt;chr&gt;
 setSpecies(key = species(), initial_concentration = c(1,20,0,0))
 
 getParameters()
-#&gt; # A tibble: 4 x 5
+#&gt; # A tibble: 4 × 5
 #&gt;   key              name  reaction    value mapping
 #&gt;   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;  
 #&gt; 1 (S + E = SE).k1  k1    S + E = SE    0.1 &lt;NA&gt;   
@@ -606,7 +760,8 @@ getParameters()
 setParameters(key = parameter(), value = c(0.1, 0.1, 0.1, 0.2))
 
 EnzCh &lt;- getCurrentModel()</code></pre>
-<p>Both of these “true” reactions would be modeled with the same Michaelis-Menten-Kinetics so let’s see how that holds up:</p>
+<p>Both of these “true” reactions would be modelled with the same
+Michaelis-Menten-Kinetics so let’s see how that holds up:</p>
 <pre class="r"><code>noEquTC &lt;- runTimeCourse(model = noEqu, duration = 1000, dt = 0.1)$result 
 EnzChTC &lt;- runTimeCourse(model = EnzCh, duration = 1000, dt = 0.1)$result
 
@@ -618,30 +773,73 @@ ggplot(mapping = aes(x = Time))+
   geom_line(data = EnzChTC,   mapping = aes(y = S, color = &quot;Substrate&quot;), linetype = &quot;dotted&quot;)+
   geom_line(data = EnzChTC,  mapping = aes(y = P, color = &quot;Product&quot;), linetype = &quot;dotted&quot;)</code></pre>
 <p><img src="michaelismenten_files/figure-html/unnamed-chunk-19-1.png" width="100%" /></p>
-<p>The dashed line (where the equilibrium approximation is not true) and especially the dotted line (where the amount of enzyme changes over time) differ significantly from the inbuilt kinetics.</p>
+<p>The dashed line (where the equilibrium approximation is not true) and
+especially the dotted line (where the amount of enzyme changes over
+time) differ significantly from the inbuilt kinetics.</p>
 </div>
 <div id="more-complicated-kinetics" class="section level1">
 <h1>More complicated kinetics</h1>
-<p>We can expand our reaction kinetics in a lot of ways. We will now find the “Michaelis-Menten-Like” kinetics for the following reaction, where the product formation is reversible:</p>
-<p><span class="math display">\[ S + E \rightleftharpoons SE \rightleftharpoons E + P \]</span></p>
-<p>with parameters <span class="math inline">\(k_f\)</span> and <span class="math inline">\(k_r\)</span> for the first reaction and <span class="math inline">\(k_F\)</span> and <span class="math inline">\(k_R\)</span> for the second reaction.</p>
+<p>We can expand our reaction kinetics in a lot of ways. We will now
+find the “Michaelis-Menten-Like” kinetics for the following reaction,
+where the product formation is reversible:</p>
+<p><span class="math display">\[ S + E \rightleftharpoons SE
+\rightleftharpoons E + P \]</span></p>
+<p>with parameters <span class="math inline">\(k_f\)</span> and <span
+class="math inline">\(k_r\)</span> for the first reaction and <span
+class="math inline">\(k_F\)</span> and <span
+class="math inline">\(k_R\)</span> for the second reaction.</p>
 <p>Our differential equations will now look the following:</p>
-<p><span class="math display">\[\frac{d[S]}{dt} = - k_f[S][E] + k_r[SE]\]</span> <span class="math display">\[\frac{d[E]}{dt} = -k_f[S][E] + k_r[SE] + k_{F}[SE] - k_R[E][P]\]</span> <span class="math display">\[\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] - k_{F}[SE] + k_R[E][P] \]</span> <span class="math display">\[\frac{d[P]}{dt} = k_{F}[SE] - k_R[E][P]\]</span></p>
-<p>We will use the equilibrium assumption, where we assume that the first forward reaction is equal to the first backward reaction:</p>
-<p><span class="math display">\[k_f[S][E] = k_r[SE]\]</span> We can again use <span class="math inline">\(E_0 = [E]+[SE] \rightarrow [E] = [E_0] - [SE]\)</span>: <span class="math display">\[ k_f[S]([E_0]-[SE]) = k_r[SE]\]</span> and move our equations around so we will have a formula for <span class="math inline">\([SE]\)</span>: <span class="math display">\[k_f[S][E_0]-k_f[S][SE] = k_r[SE]\]</span> <span class="math display">\[\hookrightarrow [SE] = \frac{k_f[S][E_0]}{k_r + k_f[S]}\]</span> We can again multiply out k_f: <span class="math display">\[[SE] = \frac{[S][E_0]}{\frac{k_r}{k_f}+[S]}\]</span> Now, we want to know the velocity of the product formation, where the differential equation is: <span class="math display">\[v = \frac{d[P]}{dt} = k_{F}[SE] - k_R[E][P]\]</span> We can put in what we found out for the concentration of the complex: <span class="math display">\[ v = k_F\frac{[S][E_0]}{\frac{k_r}{k_f}+[S]} -k_R[E][P]\]</span> and now, we have our reaction velocity for reversible Michaelis-Menten Kinetics.</p>
+<p><span class="math display">\[\frac{d[S]}{dt} = - k_f[S][E] +
+k_r[SE]\]</span> <span class="math display">\[\frac{d[E]}{dt} =
+-k_f[S][E] + k_r[SE] + k_{F}[SE] - k_R[E][P]\]</span> <span
+class="math display">\[\frac{d[ES]}{dt} = k_f[S][E] - k_r[SE] -
+k_{F}[SE] + k_R[E][P] \]</span> <span
+class="math display">\[\frac{d[P]}{dt} = k_{F}[SE] -
+k_R[E][P]\]</span></p>
+<p>We will use the equilibrium assumption, where we assume that the
+first forward reaction is equal to the first backward reaction:</p>
+<p><span class="math display">\[k_f[S][E] = k_r[SE]\]</span> We can
+again use <span class="math inline">\(E_0 = [E]+[SE] \rightarrow [E] =
+[E_0] - [SE]\)</span>: <span class="math display">\[ k_f[S]([E_0]-[SE])
+= k_r[SE]\]</span> and move our equations around so we will have a
+formula for <span class="math inline">\([SE]\)</span>: <span
+class="math display">\[k_f[S][E_0]-k_f[S][SE] = k_r[SE]\]</span> <span
+class="math display">\[\hookrightarrow [SE] = \frac{k_f[S][E_0]}{k_r +
+k_f[S]}\]</span> We can again multiply out k_f: <span
+class="math display">\[[SE] =
+\frac{[S][E_0]}{\frac{k_r}{k_f}+[S]}\]</span> Now, we want to know the
+velocity of the product formation, where the differential equation is:
+<span class="math display">\[v = \frac{d[P]}{dt} = k_{F}[SE] -
+k_R[E][P]\]</span> We can put in what we found out for the concentration
+of the complex: <span class="math display">\[ v =
+k_F\frac{[S][E_0]}{\frac{k_r}{k_f}+[S]} -k_R[E][P]\]</span> and now, we
+have our reaction velocity for reversible Michaelis-Menten Kinetics.</p>
 </div>
 <div id="what-to-learn-from-that" class="section level1">
 <h1>What to learn from that</h1>
-<p>Michaelis-Menten Kinetics are a beautiful and relatively intuitive approximation of enzyme kinetics. But you have to keep in mind, that every approximation is built on assumptions and you have to check carefully if those assumptions are true for the specific reaction in your model. There are a lot of other kinetics possible for the interaction of species in a model and it is always useful to understand what they are doing and why. This way, your model will be the best it can be!</p>
+<p>Michaelis-Menten Kinetics are a beautiful and relatively intuitive
+approximation of enzyme kinetics. But you have to keep in mind, that
+every approximation is built on assumptions and you have to check
+carefully if those assumptions are true for the specific reaction in
+your model. There are a lot of other kinetics possible for the
+interaction of species in a model and it is always useful to understand
+what they are doing and why. This way, your model will be the best it
+can be!</p>
 <div id="references" class="section level2">
 <h2>References</h2>
 </div>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>L. Menten, M. Michaelis, Die Kinetik der Invertinwirkung, Biochem Z49 (333-369) (1913) 5<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>George Edward Briggs, John Burdon Sanderson Haldane; A Note on the Kinetics of Enzyme Action. Biochem J 1 January 1925; 19 (2): 338–339. doi: <a href="https://doi.org/10.1042/bj0190338" class="uri">https://doi.org/10.1042/bj0190338</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p>L. Menten, M. Michaelis, Die Kinetik der
+Invertinwirkung, Biochem Z49 (333-369) (1913) 5<a href="#fnref1"
+class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>George Edward Briggs, John Burdon Sanderson Haldane; A
+Note on the Kinetics of Enzyme Action. Biochem J 1 January 1925; 19 (2):
+338–339. doi: <a href="https://doi.org/10.1042/bj0190338"
+class="uri">https://doi.org/10.1042/bj0190338</a><a href="#fnref2"
+class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

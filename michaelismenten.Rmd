@@ -21,7 +21,7 @@ set.seed(1)
 # Setup
 
 The code in this teaching document uses the **R** packages [**CoRC**](https://jpahle.github.io/CoRC/index.html) and [**tidyverse**](https://www.tidyverse.org/).
-Make sure they are installed before beginning. If you have not yet downloaded CoRC, take a look at the tab **Download**
+Make sure they are installed before beginning. If you have not yet downloaded CoRC, take a look at the tab **Download**.
 
 # {.tabset}
 
@@ -56,7 +56,7 @@ $$
 v = \frac{V_{max} * [S]}{K_M + [S]}
 $$
 
-with $V_{max}$ as the maximum rate of product formation (at saturating substrate concentration) and $K_M$ the value of the Michaelis-Constant.
+with $V_{max}$ the maximum rate of product formation (at saturating substrate concentration) and $K_M$ the value of the Michaelis-Constant.
 
 # Derivation
 
@@ -66,7 +66,7 @@ $$
 S + E \rightleftharpoons SE \rightarrow E + P
 $$
 
-where the substrate and the enzyme reversibly form a complex $SE$ (with parameters $k_f$ and $k_r$ for forward and reverse reactions) which then catalyzes the formation of the product and the release of the enzyme (with reaction parameter $k_{cat}$).
+where the substrate and the enzyme reversibly form a complex $SE$ (with parameters $k_f$ and $k_r$ for forward and reverse reactions) which then catalyses the formation of the product and the release of the enzyme (with reaction parameter $k_{cat}$).
 
 In this model, all our reaction follow *Mass-action kinetics* where the reaction rate is proportional to the concentration of the substrates.
 
@@ -90,7 +90,7 @@ Another important assumption is, that **the concentration of the substrate is mu
 
 ## Model in CoRC
 
-We can visualize this model using **CoRC**:
+We can visualise this model using **CoRC**:
 
 First, we have to create a new model
 
@@ -146,7 +146,7 @@ ggplot(data = timecourse, mapping = aes(x = Time, y = Concentration, color = Spe
   geom_line()
 ```
 
-There are two ways of deriving the Michaelis-Menten Kinetics from here. The *Quasi-Steady-State Assumption* and the *Equilibirum approximation*.
+There are two ways of deriving the Michaelis-Menten Kinetics from here. The *Quasi-Steady-State Assumption* and the *Equilibrium approximation*.
 You have to keep in mind, that both of these have underlying assumptions that need not necessarily be true for your model.
 
 ## Quasi-steady-state Assumption
@@ -202,12 +202,12 @@ We assume that the forward reaction is equal to the backwards reaction:
 
 $$k_f[S][E] = k_r[SE]$$
 
-The derivation of the Michaelis-Menten kinetics from this is similar to above, so we will skip that.
+The derivation of the Michaelis-Menten kinetics from this is similar to the above derivation (the interpretation of the Michaelis constant is slightly different though), so we will skip that.
 
 # Comparing models
 
 Now, we want to show how our Michaelis-Menten-Kinetics work.
-For this, we will plot the substrate and product concentration of our model next to the substrate and product concentration of a model with inbuilt Michaelis-Menten-Kinetics that looks like this:
+For this, we will plot the substrate and product concentration of our model next to the substrate and product concentration of a model with built-in Michaelis-Menten-Kinetics that looks like this:
 
 $$ S \rightarrow P $$
 
@@ -281,14 +281,14 @@ ggplot(mapping = aes(x = Time))+
   geom_line(data = manualTC,  mapping = aes(y = S, color = "Substrate"), linetype = "dotted")+
   geom_line(data = manualTC,  mapping = aes(y = P, color = "Product"), linetype = "dotted")
 ```
-As you can see, the dotted (for manual) and the normal line vary slightly, but they are very similar.
+As you can see, the dotted (for manual) and the solid line (for inbuilt) vary slightly, but they are very similar.
 
 # Non-Michaelis-Menten Kinetics
 
 We have seen, that the Michaelis-Menten Kinetics do not apply to every reaction in every model.
 From the assumptions that are in the Michaelis-Menten Kinetics, we can see which reactions **cannot** be approximated well with these kinetics:
 
-(@) The Reaction is not catalyzed by an enzyme. 
+(@) The Reaction is not catalysed by an enzyme. 
 This seems straightforward, but it is something to keep in mind.
 You need to have one species in your reaction that is needed for the reaction but does not change during the reaction.
 
@@ -296,8 +296,8 @@ You need to have one species in your reaction that is needed for the reaction bu
 Keep in mind that we assumed that $E_0$ (the total enzyme concentration) does not change over time.
 We need that assumption, and if it is not true, our model will not describe reality very well, if we still used Michaelis-Menten Kinetics.
 
-(@) The concentration of the complex is not in Steady State / The substrate is not in equilibrium with the complex.
-This is the basis for the Quasi-Steady-State and Equilibrium assumption respecitvely.
+(@) The concentration of the complex is not in steady state / The substrate is not in equilibrium with the complex.
+This is the basis for the Quasi-Steady-State and Quasi-Equilibrium assumption respectively.
 If this *assumption* is not true, we will not be able to model our reaction using Michaelis-Menten-Kinetics.
 
 (@) Our reaction is not $S + E \rightleftharpoons SE \rightarrow E + P$.
@@ -327,7 +327,7 @@ setSpecies(key = species(), initial_concentration = c(1,20,0,0))
 noEqu <- getCurrentModel()
 ```
 
-And we can have another one, where the concentration of the Enzyme changes over time:
+And we can have another one, where the concentration of the enzyme changes over time:
 
 ```{r}
 # Enzyme changes
@@ -345,7 +345,7 @@ setParameters(key = parameter(), value = c(0.1, 0.1, 0.1, 0.2))
 
 EnzCh <- getCurrentModel()
 ```
-Both of these "true" reactions would be modeled with the same Michaelis-Menten-Kinetics so let's see how that holds up:
+Both of these "true" reactions would be modelled with the same Michaelis-Menten-Kinetics so let's see how that holds up:
 
 ```{r}
 noEquTC <- runTimeCourse(model = noEqu, duration = 1000, dt = 0.1)$result 

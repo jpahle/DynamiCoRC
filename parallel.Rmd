@@ -61,7 +61,7 @@ setTimeCourseSettings(method = list(method = "directMethod",
 model_string <- saveModelToString()
 ```
 
-Next, we will set everything up to run 1000 Timecouses in parallel.
+Next, we will set everything up to run 1000 timecourses in parallel.
 We need to export our model to the workers, as well as load CoRC and our model for each worker.
 Afterwards, we set 1000 random seeds so each time course will get a different random seed.
 Lastly, we call the timecourse function.
@@ -85,7 +85,7 @@ timeseries <-
 ```
 
 Now, we will reshape our data to plot it later on:
-`timeseries` is a list of 1000 tibbles with each tibble being time course. 
+`timeseries` is a list of 1000 tibbles with each tibble being a time course. 
 
 ```{r}
 plotdata <-
@@ -142,7 +142,7 @@ setSteadyStateSettings(calculate_jacobian = FALSE, perform_stability_analysis = 
 model_string <- saveModelToString()
 ```
 
-This time, we will run 1000 stady-state calculations with random concentrations of two species (cysteine and adomed). 
+This time, we will run 1000 steady-state calculations with random concentrations of two species (cysteine and adomed). 
 
 We will export the model to the workers, load CoRC and the model.
 Then we will assign random concentrations and run a steady state calculation:

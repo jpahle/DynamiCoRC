@@ -25,11 +25,11 @@ library(tidyverse)
 
 # Introduction
 
-In this workflow we will show you an implementation of a parameter estimation on the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
+In this workflow we will show you an implementation of a parameter estimation from the [Mendes 2009 paper](https://doi.org/10.1007/978-1-59745-525-1_2)[^1] on **COPASI** use cases.
 
 [**Click here**](https://lab.pahle.org/DynamiCoRC/parameterestimation) to go to the interactive implementation of this document as a Shiny website which is hosted on the free service of shinyapps.io!
 
-You can see a *Timecourse* of the species of the model below.
+You can see a *time course* of the species of the model below.
 The points are measurements of two of the species in the model.
 
 ```{r, echo = FALSE}
@@ -80,9 +80,9 @@ library(ggplot2)
 ## 1. Load a model
 
 As stated above, to make a parameter estimation, you have to have a model to work on.
-If you want to know how to build you own model, you can [klick here](https://jpahle.github.io/CoRC/articles/model_building.html).
+If you want to know how to build you own model, you can [click here](https://jpahle.github.io/CoRC/articles/model_building.html).
 
-In this workflow, we will instead load a SMBL-model. This model is from Kholodenko (2000)[^2]
+In this workflow, we will instead load an SBML-model. This model is from Kholodenko (2000)[^2]
 
 ```{r}
 loadSBML("https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010.2?filename=BIOMD0000000010_url.xml")
@@ -97,13 +97,13 @@ getSpecies()
 
 This works in a similar way for reactions (`getReactions()`) and parameters (`getParameters()`)
 
-If you have **COPASI** installed, you can also have a look at the model there:
+If you have **COPASI** installed, you can also have a look at the model there by starting the GUI with this model loaded already:
 
 ```{r, eval=FALSE}
 openCopasi()
 ```
 
-## 2. Define an Experiment
+## 2. Define an experiment
 
 Defining an experiment in **CoRC** means telling the program which data to fit and what the data actually describes.
 
@@ -140,7 +140,7 @@ fit_experiments <- defineExperiments(
 )
 ```
 
-## 3. Define Parameters
+## 3. Define parameters
 
 We now have to define parameters that will be fitted. 
 
@@ -152,7 +152,7 @@ getParameters()
 
 Now, we only want to fit the reaction rates (parameters with V).
 To make our fit parameters we need to make a list of lists with the attributes of the different parameter-estimation settings.
-To *define* a parameter for Parameter Estimation, we use the `defineParameterEstimationParameter()` function.
+To *define* a parameter for parameter estimation, we use the `defineParameterEstimationParameter()` function.
 
 
 ```{r}
@@ -199,14 +199,14 @@ fit_parameters <- list(
 
 ## 4. Run parameter estimation
 
-To show how well our Parameter Estimation works, we want to print the model before and after parameter estimation.
-To do this, we have to *run* two Time Course evaluations, one with the parameters now, and one with the parameters after the Parameter Estimation.
+To show how well our parameter estimation works, we want to print the model before and after parameter estimation.
+To do this, we have to *run* two time course evaluations, one with the parameters now, and one with the parameters after the parameter estimation.
 
 ```{r}
 before <- runTimeCourse(duration = 1000, dt = 1)$result
 ```
 
-After doing this, we will now actually run the Parameter Estimation.
+After doing this, we will now actually run the parameter estimation.
 We need the parameters, experiments with our data that will be fitted, and specify the method.
 We want to use the Levenberg Marquardt method but other methods are available as well.
 You can find them using the function `getValidReactionFunctions()` with your function as an argument.
@@ -276,7 +276,7 @@ as well as our result for Mos-P
 MosP
 ```
 
-show, how well the Parameter Estimation was able to fit our model to the data.
+show, how well the parameter estimation was able to fit our model to the data.
 
 At the end, we can *unload* our model, to free some memory. 
 
