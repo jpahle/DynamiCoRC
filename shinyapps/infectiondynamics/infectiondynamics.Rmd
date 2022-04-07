@@ -62,7 +62,7 @@ if (!exists("timestamp", inherits = FALSE) || is.null(timestamp) || ((Sys.Date()
 stopifnot(exists("data_df"))
 
 data_df <- data_df %>%
-  separate(year_week, sep = coll("-"), into = c("year", "week")) %>%
+  separate(year_week, sep = "-", into = c("year", "week")) %>%
   mutate(
     date = ISOweek2date(paste0(year, "-W", week, "-7")),
     across(c(year, week), as.integer)
