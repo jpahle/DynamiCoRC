@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6423078.svg)](https://doi.org/10.5281/zenodo.6423078)
+
 # Dynamic Publication Media with the COPASI R Connector (CoRC) 
 
 Dynamically published documents (instead of static ones like books and papers) offer a wide range of advantages.
