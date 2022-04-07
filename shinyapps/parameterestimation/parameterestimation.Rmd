@@ -375,3 +375,5 @@ unloadModel()
 ## References
 [^1]: Mendes P., Hoops S., Sahle S., Gauges R., Dada J., Kummer U. (2009) Computational Modeling of Biochemical Networks Using COPASI. In: Maly I. (eds) Systems Biology. Methods in Molecular Biology (Methods and Protocols), vol 500. Humana Press. https://doi.org/10.1007/978-1-59745-525-1_2
 [^2]: Kholodenko BN. Negative feedback and ultrasensitivity can bring about oscillations in the mitogen-activated protein kinase cascades. Eur J Biochem. 2000 Mar;267(6):1583-8. doi: 10.1046/j.1432-1327.2000.01197.x. PMID: 10712587.
+
+This material is published under the [Creative Commons BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/legalcode.txt)
