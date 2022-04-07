@@ -6,20 +6,23 @@ They are created dynamically, using code (chunks), and/or you can interact with 
 Here, we focus on three different main application areas for dynamic documents: **Documentation**, **Teaching** and **Science Communication**.
 With this repository, we publish a selection of example documents illustrating the use of dynamic documents covering these topics:
 
-- Optimisation  
-  [[HTML page](https://jpahle.github.io/DynamiCoRC/optimisation)] [[Source code](optimisation.Rmd)]
-- Parallel Processing  
-  [[HTML page](https://jpahle.github.io/DynamiCoRC/parallel)] [[Source code](parallel.Rmd)]
-- Michaelis-Menten Kinetics  
-  [[HTML page](https://jpahle.github.io/DynamiCoRC/michaelismenten)] [[Source code](michaelismenten.Rmd)]
-- Parameter Estimation  
-  [[HTML page](https://jpahle.github.io/DynamiCoRC/parameterestimation)] [[Source code](parameterestimation.Rmd)]  
-  [[Shiny app](https://lab.pahle.org/DynamiCoRC/parameterestimation)] [[Source code](shinyapps/parameterestimation/parameterestimation.Rmd)]
-- Oscillatory Dynamics  
-  [[HTML page](https://jpahle.github.io/DynamiCoRC/oscillations)] [[Source code](oscillations.Rmd)]  
-  [[Google Colab](https://lab.pahle.org/DynamiCoRC/oscillatorydynamics)] [[Source code](oscillations.ipynb)]
-- Infection Dynamics  
-  [[Shiny app](https://lab.pahle.org/DynamiCoRC/infectiondynamics)] [[Source code](shinyapps/infectiondynamics/infectiondynamics.Rmd)]
+- Documentation
+  - Optimisation  
+    [[HTML page](https://jpahle.github.io/DynamiCoRC/optimisation)] [[Source code](optimisation.Rmd)]
+  - Parallel Processing  
+    [[HTML page](https://jpahle.github.io/DynamiCoRC/parallel)] [[Source code](parallel.Rmd)]
+- Teaching
+  - Michaelis-Menten Kinetics  
+    [[HTML page](https://jpahle.github.io/DynamiCoRC/michaelismenten)] [[Source code](michaelismenten.Rmd)]
+  - Parameter Estimation  
+    [[HTML page](https://jpahle.github.io/DynamiCoRC/parameterestimation)] [[Source code](parameterestimation.Rmd)]  
+    [[Shiny app](https://lab.pahle.org/DynamiCoRC/parameterestimation)] [[Source code](shinyapps/parameterestimation/parameterestimation.Rmd)]
+  - Oscillatory Dynamics  
+    [[HTML page](https://jpahle.github.io/DynamiCoRC/oscillations)] [[Source code](oscillations.Rmd)]  
+    [[Google Colab](https://lab.pahle.org/DynamiCoRC/oscillatorydynamics)] [[Source code](oscillations.ipynb)]
+- Science Communication
+  - Infection Dynamics  
+    [[Shiny app](https://lab.pahle.org/DynamiCoRC/infectiondynamics)] [[Source code](shinyapps/infectiondynamics/infectiondynamics.Rmd)]
 
 # Dynamic Documents with CoRC
 
