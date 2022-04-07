@@ -12,7 +12,7 @@ They are created dynamically, using code (chunks), and/or you can interact with 
 
 Here, we focus on three different main application areas for dynamic documents: **Documentation**, **Teaching** and **Science Communication**.
 
-The documents provided for this paper are found on this page.
+All example documents can be reached via the tabs above.
 
 ## Dynamic Documents with CoRC
 
